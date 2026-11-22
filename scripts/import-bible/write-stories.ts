@@ -9,7 +9,7 @@ const root = path.resolve(import.meta.dirname, '../..')
 function storiesSql(): string {
   const storyRows = STORIES.map(
     (story, index) =>
-      `(${sqlString(story.slug)}, ${sqlString(story.title)}, ${sqlString(story.summary)}, ${sqlString(story.testament)}, ${sqlString(story.startRef)}, ${sqlString(story.endRef)}, ${sqlString(story.scenes.map((scene) => scene.narration).join('\n\n'))}, ${story.kids ? 'kids' : 'all'}, ${story.bedtime}, 'free', ${index + 1}, 'published')`,
+      `(${sqlString(story.slug)}, ${sqlString(story.title)}, ${sqlString(story.summary)}, ${sqlString(story.testament)}, ${sqlString(story.startRef)}, ${sqlString(story.endRef)}, ${sqlString(story.scenes.map((scene) => scene.narration).join('\n\n'))}, ${sqlString(story.kids ? 'kids' : 'all')}, ${story.bedtime}, 'free', ${index + 1}, 'published')`,
   ).join(',\n')
   const sceneRows = STORIES.flatMap((story) =>
     story.scenes.map(

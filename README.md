@@ -41,9 +41,9 @@ It writes chunked SQL under 900 KB to `supabase/seed/bible/<version>/` and a sma
 
 Apply order, in the Supabase SQL editor:
 
-1. `supabase/seed/dev/web_sample.sql` for a quick demo, or the full set below.
+1. Either `supabase/seed/dev/web_sample.sql` on an empty database, for a quick demo, or the full set below. Do not apply `web_sample.sql` after the full Bible. It rewrites `books.chapter_count` for Genesis, Psalms, Matthew, and John down to the handful of sample chapters.
 2. For `web`, then `kjv`, then `bsb`: `00_books_chapters.sql`, then `verses_001.sql`, `verses_002.sql`, … in order.
-3. `supabase/seed/stories.sql` for the 30 story retellings and placeholder media rows.
+3. `supabase/seed/stories.sql` for the 30 story retellings and placeholder media rows. Age bands are quoted string literals (`'kids'`, `'all'`). The live database already has this story data and the full WEB, BSB, and KJV text, so these files do not need to be applied again.
 
 ## One-time setup for the owner
 
