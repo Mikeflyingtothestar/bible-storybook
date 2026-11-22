@@ -30,32 +30,70 @@ type RemoteVerse = {
   text: string
 }
 
+const chapterCache = new Map<string, LoadedChapter>()
+
+export function cleanVerseText(text: string): string {
+  return text.replace(/^\s*¶\s*/, '').replace(/\s+/g, ' ').trim()
+}
+
+export function chapterQueryKey(version: string, book: string, chapter: number) {
+  return ['chapter', version, book, chapter] as const
+}
+
+export function cachedChapter(version: string, book: string, chapter: number): LoadedChapter | undefined {
+  return chapterCache.get(`${version}:${book}:${chapter}`)
+}
+
 export async function loadChapter(version: VersionCode, book: string, chapter: number): Promise<LoadedChapter> {
+  const key = `${version}:${book}:${chapter}`
+  const hit = chapterCache.get(key)
+  if (hit) return hit
   const info = bookByOsis(book)
   const bookName = info?.name ?? book
-  const remote = await loadRemote(version, book, chapter)
+  let remote: { chapterId: number | null; verses: LoadedVerse[] } | null = null
+  try {
+    remote = await loadRemote(version, book, chapter)
+  } catch (error) {
+    const sample = sampleChapter(version, book, bookName, chapter, null)
+    if (sample) return remember(key, sample)
+    throw error
+  }
   if (remote && remote.verses.length > 0) {
-    return { version, book, bookName, chapter, chapterId: remote.chapterId, verses: remote.verses, source: 'library' }
+    return remember(key, { version, book, bookName, chapter, chapterId: remote.chapterId, verses: remote.verses, source: 'library' })
   }
-  if (version === 'WEB') {
-    const sample = bundledChapter(book, chapter)
-    if (sample) {
-      return {
-        version,
-        book,
-        bookName: sample.bookName || bookName,
-        chapter,
-        chapterId: remote?.chapterId ?? null,
-        verses: sample.verses.map((verse) => ({
-          ...verse,
-          id: null,
-          osisRef: `${book}.${chapter}.${verse.number}`,
-        })),
-        source: 'sample',
-      }
-    }
-  }
+  const sample = sampleChapter(version, book, bookName, chapter, remote?.chapterId ?? null)
+  if (sample) return remember(key, sample)
   return { version, book, bookName, chapter, chapterId: null, verses: [], source: 'empty' }
+}
+
+function remember(key: string, chapter: LoadedChapter): LoadedChapter {
+  chapterCache.set(key, chapter)
+  return chapter
+}
+
+function sampleChapter(
+  version: VersionCode,
+  book: string,
+  bookName: string,
+  chapter: number,
+  chapterId: number | null,
+): LoadedChapter | null {
+  if (version !== 'WEB') return null
+  const sample = bundledChapter(book, chapter)
+  if (!sample) return null
+  return {
+    version,
+    book,
+    bookName: sample.bookName || bookName,
+    chapter,
+    chapterId,
+    verses: sample.verses.map((verse) => ({
+      ...verse,
+      id: null,
+      osisRef: `${book}.${chapter}.${verse.number}`,
+    })),
+    source: 'sample',
+  }
 }
 
 async function loadRemote(
@@ -63,19 +101,26 @@ async function loadRemote(
   book: string,
   chapter: number,
 ): Promise<{ chapterId: number | null; verses: LoadedVerse[] } | null> {
+  const { data: chapterRow, error: chapterError } = await supabase
+    .from('chapters')
+    .select('id, books!inner(osis_code, bible_versions!inner(code))')
+    .eq('number', chapter)
+    .eq('books.osis_code', book)
+    .eq('books.bible_versions.code', version)
+    .maybeSingle()
+  if (chapterError) throw new Error(chapterError.message)
+  const chapterId = (chapterRow as { id?: number } | null)?.id
+  if (!chapterId) return { chapterId: null, verses: [] }
   const { data, error } = await supabase
     .from('verses')
-    .select('id, chapter_id, number, osis_ref, text, chapters!inner(number, books!inner(osis_code, bible_versions!inner(code)))')
-    .eq('chapters.books.osis_code', book)
-    .eq('chapters.number', chapter)
-    .eq('chapters.books.bible_versions.code', version)
+    .select('id, chapter_id, number, osis_ref, text')
+    .eq('chapter_id', chapterId)
     .order('number')
-  if (error || !data) return null
-  const rows = data as unknown as RemoteVerse[]
-  if (!rows.length) return { chapterId: null, verses: [] }
+  if (error) throw new Error(error.message)
+  const rows = (data ?? []) as unknown as RemoteVerse[]
   return {
-    chapterId: rows[0]?.chapter_id ?? null,
-    verses: rows.map((row) => ({ id: row.id, number: row.number, text: row.text, osisRef: row.osis_ref })),
+    chapterId,
+    verses: rows.map((row) => ({ id: row.id, number: row.number, text: cleanVerseText(row.text), osisRef: row.osis_ref })),
   }
 }
 

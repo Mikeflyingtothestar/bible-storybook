@@ -29,13 +29,18 @@ export default function SearchScreen() {
         />
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Search"
+          accessibilityLabel="Search verses"
           testID="search-submit"
           onPress={() => {
-            void searchBible(version, query).then((rows) => {
-              setHits(rows)
-              setNote(rows.length ? null : 'No verses matched. If the library is still empty, try words from the sample chapters, such as shepherd or light.')
-            })
+            void searchBible(version, query)
+              .then((rows) => {
+                setHits(rows)
+                setNote(rows.length ? null : 'No verses matched. Try a word from the chapter you were reading.')
+              })
+              .catch(() => {
+                setHits([])
+                setNote('Search needs a connection. Try again when you are back online.')
+              })
           }}
           style={{ minHeight: 48, borderRadius: 14, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}
         >
