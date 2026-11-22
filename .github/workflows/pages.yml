@@ -27,7 +27,34 @@ jobs:
       - run: npm run export:web
         env:
           EXPO_PUBLIC_SITE_URL: https://mikeflyingtothestar.github.io/bible-storybook
+      - name: Ensure GitHub Pages exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          status=$(curl -sS -o /tmp/pages.json -w "%{http_code}" \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/pages")
+          if [ "$status" = "200" ]; then
+            echo "Pages site already exists"
+          else
+            echo "Pages site returned $status; creating a GitHub Actions site"
+            create=$(curl -sS -o /tmp/pages-create.json -w "%{http_code}" -X POST \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${{ github.repository }}/pages" \
+              -d '{"build_type":"workflow"}')
+            echo "Create status $create"
+            cat /tmp/pages-create.json
+            if [ "$create" != "201" ] && [ "$create" != "409" ]; then
+              echo "Could not enable GitHub Pages. In the repo settings, set Pages source to GitHub Actions."
+              exit 1
+            fi
+          fi
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: dist

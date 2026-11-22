@@ -11,7 +11,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useFonts } from 'expo-font'
 import { Stack } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 import { AuthProvider } from '@/src/auth/AuthProvider'
@@ -24,7 +24,7 @@ const queryClient = new QueryClient({
 })
 
 export default function RootLayout() {
-  const [fontsLoaded, fontError] = useFonts({
+  const [fontsLoaded] = useFonts({
     Nunito_400Regular,
     Nunito_600SemiBold,
     Nunito_700Bold,
@@ -33,26 +33,16 @@ export default function RootLayout() {
     Literata_600SemiBold,
     Literata_700Bold,
   })
-  const [waited, setWaited] = useState(false)
 
   useEffect(() => {
-    const timer = setTimeout(() => setWaited(true), 2500)
-    return () => clearTimeout(timer)
+    void SplashScreen.hideAsync().catch(() => undefined)
   }, [])
-
-  const ready = fontsLoaded || Boolean(fontError) || waited
-
-  useEffect(() => {
-    if (ready) void SplashScreen.hideAsync().catch(() => undefined)
-  }, [ready])
-
-  if (!ready) return null
 
   return (
     <SafeAreaProvider>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <ThemeProvider fontsReady={fontsLoaded}>
+          <ThemeProvider fontsReady={Boolean(fontsLoaded)}>
             <Stack screenOptions={{ headerShown: false }}>
               <Stack.Screen name="(marketing)" />
               <Stack.Screen name="(auth)" />

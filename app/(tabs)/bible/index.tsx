@@ -22,6 +22,7 @@ export default function BibleIndex() {
                 key={item.code}
                 accessibilityRole="button"
                 accessibilityLabel={item.name}
+                testID={`version-${item.code}`}
                 onPress={() => setVersion(item.code as VersionCode)}
                 style={{ minHeight: 44, paddingHorizontal: 14, borderRadius: 999, justifyContent: 'center', backgroundColor: selected ? colors.accent : colors.surface }}
               >

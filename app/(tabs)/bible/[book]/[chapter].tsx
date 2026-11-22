@@ -1,10 +1,10 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useLocalSearchParams, useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { Platform, Pressable, ScrollView, View } from 'react-native'
 
 import { bookByOsis, neighborChapter } from '@/src/bible/catalog'
-import { loadChapter, type LoadedVerse } from '@/src/bible/load'
+import { cachedChapter, chapterQueryKey, loadChapter, type LoadedVerse } from '@/src/bible/load'
 import { SAMPLE_LABEL } from '@/src/bible/sample'
 import { ListenBar } from '@/src/components/ListenBar'
 import { AppBar, ThemeSwitcher, Txt } from '@/src/components/ui'
@@ -23,9 +23,13 @@ export default function ChapterReader() {
   const setLastPosition = usePrefs((state) => state.setLastPosition)
   const { colors } = useAppTheme()
   const info = bookByOsis(book)
+  const client = useQueryClient()
+  const cached = cachedChapter(version, book, chapter)
   const query = useQuery({
-    queryKey: ['chapter', version, book, chapter],
+    queryKey: chapterQueryKey(version, book, chapter),
     queryFn: () => loadChapter(version, book, chapter),
+    staleTime: 10 * 60_000,
+    ...(cached ? { initialData: cached } : {}),
   })
   const [selected, setSelected] = useState<LoadedVerse | null>(null)
   const [activeVerse, setActiveVerse] = useState<number | null>(null)
@@ -42,7 +46,14 @@ export default function ChapterReader() {
 
   useEffect(() => {
     setLastPosition({ version, book, chapter })
-  }, [version, book, chapter, setLastPosition])
+    const next = neighborChapter(book, chapter, 1)
+    if (!next) return
+    void client.prefetchQuery({
+      queryKey: chapterQueryKey(version, next.osis, next.chapter),
+      queryFn: () => loadChapter(version, next.osis, next.chapter),
+      staleTime: 10 * 60_000,
+    })
+  }, [version, book, chapter, setLastPosition, client])
 
   useReadingSession({ chapterId: loaded?.chapterId ?? null, mode: 'text', completed: finished, enabled: Boolean(loaded) })
 
@@ -74,6 +85,20 @@ export default function ChapterReader() {
       <ScrollView contentContainerStyle={{ paddingBottom: 24 }}>
         <View style={{ width: '100%', maxWidth: 680, alignSelf: 'center', paddingHorizontal: 20, gap: 14 }}>
           <ThemeSwitcher />
+          {query.isPending && !loaded ? <ChapterSkeleton /> : null}
+          {query.isError && !loaded ? (
+            <View testID="chapter-error" style={{ gap: 8 }}>
+              <Txt size={28} weight={700} serif>
+                This chapter didn’t load.
+              </Txt>
+              <Txt color={colors.muted}>Check your connection, then try again. Your place on this page is unchanged.</Txt>
+              <Pressable accessibilityRole="button" accessibilityLabel="Try loading the chapter again" onPress={() => void query.refetch()} style={{ minHeight: 48, justifyContent: 'center' }}>
+                <Txt weight={700} color={colors.accent}>
+                  Try again
+                </Txt>
+              </Pressable>
+            </View>
+          ) : null}
           {loaded?.source === 'sample' ? (
             <View testID="sample-banner" style={{ backgroundColor: colors.surface, borderRadius: 16, padding: 12 }}>
               <Txt color={colors.muted}>You are reading a sample of the World English Bible. The rest of the library is loading soon. Included now: {SAMPLE_LABEL}.</Txt>
@@ -141,6 +166,17 @@ export default function ChapterReader() {
         <ListenBar verses={loaded.verses} rate={rate} onRate={setRate} activeVerse={activeVerse} onActiveVerse={setActiveVerse} />
       ) : null}
       <VerseSheet visible={Boolean(selected)} verse={selected} onClose={() => setSelected(null)} version={version} book={book} chapter={chapter} />
+    </View>
+  )
+}
+
+function ChapterSkeleton() {
+  const { colors } = useAppTheme()
+  return (
+    <View testID="chapter-skeleton" accessibilityLabel="Loading chapter" style={{ gap: 14 }}>
+      {[0.92, 0.74, 0.86, 0.55].map((width, index) => (
+        <View key={index} style={{ height: 18, width: `${width * 100}%`, borderRadius: 8, backgroundColor: colors.surface }} />
+      ))}
     </View>
   )
 }
