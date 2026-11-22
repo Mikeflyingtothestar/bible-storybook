@@ -1,9 +1,13 @@
 import Constants from 'expo-constants'
 
+import { authCallbackFor, resolveSiteUrl } from './site-url'
+
 const extra = (Constants.expoConfig?.extra ?? {}) as {
   supabaseUrl?: string
   supabasePublishableKey?: string
 }
+
+export { BASE_PATH, PRODUCTION_SITE_URL, resolveSiteUrl } from './site-url'
 
 /** Public project values. The service-role key is never read here. */
 export const supabaseUrl =
@@ -16,12 +20,17 @@ export const supabasePublishableKey =
   'sb_publishable_6CxUJnf_A4jMTrgevmALUA_J9AHj_SV'
 
 export function siteUrl(): string {
-  const configured = process.env.EXPO_PUBLIC_SITE_URL
-  if (configured) return configured.replace(/\/$/, '')
-  if (typeof window !== 'undefined' && window.location?.origin) return window.location.origin
-  return 'http://localhost:8081'
+  return resolveSiteUrl({
+    configured: process.env.EXPO_PUBLIC_SITE_URL,
+    origin: typeof window !== 'undefined' ? window.location.origin : undefined,
+    pathname: typeof window !== 'undefined' ? window.location.pathname : undefined,
+  })
 }
 
 export function authRedirect(): string {
-  return `${siteUrl()}/auth/callback`
+  return authCallbackFor({
+    configured: process.env.EXPO_PUBLIC_SITE_URL,
+    origin: typeof window !== 'undefined' ? window.location.origin : undefined,
+    pathname: typeof window !== 'undefined' ? window.location.pathname : undefined,
+  })
 }

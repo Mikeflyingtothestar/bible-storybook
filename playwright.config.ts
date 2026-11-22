@@ -9,7 +9,7 @@ export default defineConfig({
   },
   webServer: {
     command: 'node scripts/serve-spa.mjs',
-    url: 'http://127.0.0.1:4173',
+    url: 'http://127.0.0.1:4173/bible-storybook/',
     reuseExistingServer: !process.env.CI,
     timeout: 30_000,
   },

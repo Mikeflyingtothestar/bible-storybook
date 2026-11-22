@@ -12,7 +12,7 @@ npm run web          # Expo dev server
 npm run typecheck
 npm run lint
 npm test
-npm run export:web   # dist/ for Cloudflare Pages
+npm run export:web   # dist/ for GitHub Pages
 npm run test:e2e     # Playwright against dist/ (export first)
 npm run import:bible # rewrite SQL seeds from the public-domain sources
 ```
@@ -23,7 +23,7 @@ Copy `.env.example` to `.env` for local overrides. The URL and publishable key a
 
 Never commit a service-role key, database password, Stripe secret, or webhook secret. Billing stays a “Coming soon” paywall. Paid media stays behind feature flags (`video_mode`, `premium_voices`, `billing`, `offline_media`).
 
-`web.output` is `single`. Expo SDK 58’s `static` output pre-renders one HTML file per route and does not serve unknown chapter URLs. The single-page export plus `public/_redirects` (`/* /index.html 200`) is what Cloudflare Pages needs for `/bible/GEN/1` and the other dynamic routes. `npm run export:web` also stamps the landing-page title and description into `dist/index.html`.
+The site is a single-page web export (`web.output` is `single`) hosted at `https://mikeflyingtothestar.github.io/bible-storybook/`. `experiments.baseUrl` is `/bible-storybook`, so routes and assets include that prefix. GitHub Pages has no rewrite rules, so `npm run export:web` copies `index.html` to `404.html` (SPA fallback) and writes `.nojekyll` so the `_expo` asset folder is published.
 
 ## Bible text
 
@@ -47,15 +47,10 @@ Apply order, in the Supabase SQL editor:
 
 ## One-time setup for the owner
 
-1. **Cloudflare Pages** (free, works with this private repo). Create a project named `bible-storybook`.
-   - Build command: `npm ci && npm run export:web`
-   - Output directory: `dist`
-   - The repo already contains `public/_redirects` and `public/_headers` (CSP, no `eval` allowance, frame denial). They are copied into `dist`.
-   - Add repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`, then run the **Deploy Cloudflare Pages** workflow. Or connect the repo in the Pages dashboard and use the build settings above.
-   - After the first deploy, set the `EXPO_PUBLIC_SITE_URL` variable to the Pages URL and rebuild so canonical tags match.
+1. **Make this repository public.** GitHub Pages is free for public repositories. In Settings → Pages, set Source to **GitHub Actions**. The workflow `.github/workflows/pages.yml` builds `npm run export:web` and deploys `dist` on every push to `main`, and it can also be run by hand. No Cloudflare or Vercel project is required.
 2. **Supabase Auth → URL configuration**
-   - Site URL: the Pages origin, for example `https://bible-storybook.pages.dev`
-   - Redirect URLs: `https://<pages-host>/auth/callback`, `http://localhost:8081/auth/callback`, and `biblestorybook://auth/callback`
+   - Site URL: `https://mikeflyingtothestar.github.io/bible-storybook`
+   - Redirect URLs: `https://mikeflyingtothestar.github.io/bible-storybook/auth/callback`, `http://localhost:8081/auth/callback`, and `biblestorybook://auth/callback`
 3. **Google and Apple providers.** The buttons are wired. Until the providers are enabled in the Supabase dashboard, the app shows a friendly message and email sign-in still works.
 4. **SMTP.** The built-in mailer is about two emails an hour. Add custom SMTP (Resend’s free tier is enough) before sharing magic links widely.
 5. **Apply the Bible seeds** using the order above. Do not re-run `supabase/migrations/0001`–`0003`.

@@ -38,7 +38,8 @@
       ]
     ],
     "experiments": {
-      "typedRoutes": false
+      "typedRoutes": false,
+      "baseUrl": "/bible-storybook"
     },
     "extra": {
       "supabaseUrl": "https://nkpnanqbiehoqgnpmlhh.supabase.co",
