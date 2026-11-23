@@ -143,7 +143,9 @@ export default function ChapterReader() {
                   <Txt serif size={Math.max(12, Math.round(fontSize * 0.62))} weight={700} color={colors.accent}>
                     {verse.number}{' '}
                   </Txt>
-                  {verse.text}
+                  <Txt serif size={fontSize} illuminated={verse.number === 1 && /^[A-Za-zÀ-ÿ]/.test(verse.text)} style={{ lineHeight: Math.round(fontSize * 1.75) }}>
+                    {verse.text}
+                  </Txt>
                 </Txt>
               </Pressable>
             )

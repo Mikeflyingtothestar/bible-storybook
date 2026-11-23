@@ -2,6 +2,10 @@ import { Link } from 'expo-router'
 import { useState, type ReactNode } from 'react'
 import { Platform, Pressable, View, type ViewStyle } from 'react-native'
 
+import { ART_SOURCES } from '@/src/art/images'
+import { ARTWORKS } from '@/src/art/works'
+import { ArtImage, CommonsLink } from '@/src/components/ArtworkFrame'
+import { OliveSprig, RoseWindow, Wordmark } from '@/src/components/Motifs'
 import { Button, Screen, ThemeSwitcher, Txt } from '@/src/components/ui'
 import { useAppTheme } from '@/src/theme/ThemeProvider'
 
@@ -39,13 +43,16 @@ function Band({
   children,
   background,
   pad = 88,
+  motif = false,
 }: {
   children: ReactNode
   background: string
   pad?: number
+  motif?: boolean
 }) {
   return (
-    <View style={{ width: '100%', backgroundColor: background, paddingVertical: pad, paddingHorizontal: 20 }}>
+    <View style={{ width: '100%', backgroundColor: background, paddingVertical: pad, paddingHorizontal: 20, overflow: 'hidden' }}>
+      {motif ? <RoseWindow /> : null}
       <View style={{ width: '100%', maxWidth: 1120, alignSelf: 'center' }}>{children}</View>
     </View>
   )
@@ -100,6 +107,9 @@ function BookScene() {
           <View style={{ height: 8, width: '54%', backgroundColor: '#EFEAF8', borderRadius: 4 }} />
         </View>
       </View>
+      <View style={{ position: 'absolute', top: 22, left: 22, width: 84, height: 112, borderRadius: 8, overflow: 'hidden', borderWidth: 2, borderColor: '#E7D7A4' }}>
+        <ArtImage source={ART_SOURCES.kells} alt="Chi Rho page from the Book of Kells, about 800" eager />
+      </View>
     </View>
   )
 }
@@ -121,7 +131,7 @@ export default function LandingPage() {
         }}
       >
         <View style={{ maxWidth: 1120, width: '100%', alignSelf: 'center', flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingVertical: 14, gap: 12 }}>
-          <Txt weight={700}>Bible Storybook</Txt>
+          <Wordmark />
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
             <Link href="/bible" asChild>
               <Pressable accessibilityRole="link" accessibilityLabel="Read" style={{ minHeight: 44, justifyContent: 'center', paddingHorizontal: 12 }}>
@@ -167,7 +177,7 @@ export default function LandingPage() {
         </View>
       </Band>
 
-      <Band background={wash}>
+      <Band background={wash} motif>
         <Reveal>
           <Txt size={44} weight={700} serif>
             How it works
@@ -269,6 +279,41 @@ export default function LandingPage() {
         </Reveal>
       </Band>
 
+      <Band background={colors.bg} motif>
+        <Reveal>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <OliveSprig />
+            <Txt size={14} weight={700} color={colors.accent} style={{ letterSpacing: 1.4 }}>
+              FROM THE CATACOMBS TO THE ENGRAVERS
+            </Txt>
+          </View>
+          <Txt size={48} weight={700} serif style={{ marginTop: 12, maxWidth: 760 }}>
+            Art through the ages
+          </Txt>
+          <Txt color={colors.muted} style={{ marginTop: 12, maxWidth: 640, marginBottom: 28 }}>
+            Eight works the church has lived with, from a Roman catacomb to a nineteenth-century Bible engraving. Each file on Wikimedia Commons is marked public domain.
+          </Txt>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16 }}>
+            {ARTWORKS.map((work) => (
+              <View key={work.id} {...lift} style={{ flexGrow: 1, flexBasis: 240, minWidth: 0, backgroundColor: colors.surface, borderRadius: 24, overflow: 'hidden', borderWidth: 1, borderColor: colors.border }}>
+                <View style={{ height: 280, backgroundColor: colors.bg }}>
+                  <ArtImage source={ART_SOURCES[work.id]} alt={work.alt} />
+                </View>
+                <View style={{ padding: 18, gap: 6 }}>
+                  <Txt size={20} weight={700} serif>
+                    {work.title}
+                  </Txt>
+                  <Txt color={colors.muted}>
+                    {work.artist} · {work.date}
+                  </Txt>
+                  <CommonsLink href={work.page} />
+                </View>
+              </View>
+            ))}
+          </View>
+        </Reveal>
+      </Band>
+
       <Band background={wash}>
         <Reveal>
           <Txt size={44} weight={700} serif>
@@ -307,7 +352,7 @@ export default function LandingPage() {
         </View>
         <View style={{ marginTop: 36, paddingTop: 28, borderTopWidth: 1, borderTopColor: colors.border, flexDirection: 'row', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
           <View style={{ gap: 6 }}>
-            <Txt weight={700}>Bible Storybook</Txt>
+            <Wordmark />
             <Txt color={colors.muted}>Public-domain text. No leaderboards.</Txt>
           </View>
           <View style={{ flexDirection: 'row', gap: 20 }}>

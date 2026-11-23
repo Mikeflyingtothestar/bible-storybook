@@ -6,6 +6,7 @@ import { friendlyAuthError } from '../auth/errors'
 import { authRedirect } from '../lib/env'
 import { supabase } from '../lib/supabase'
 import { useAppTheme } from '../theme/ThemeProvider'
+import { Wordmark } from './Motifs'
 import { Button, Column, Field, Screen, ThemeSwitcher, Txt } from './ui'
 
 export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
@@ -32,10 +33,8 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
   return (
     <Screen testID={mode}>
       <Column width={480} style={{ paddingTop: 48, gap: 16 }}>
-        <Link href="/">
-          <Txt weight={700} color={colors.accent}>
-            Bible Storybook
-          </Txt>
+        <Link href="/" accessibilityLabel="Bible Storybook home">
+          <Wordmark />
         </Link>
         <Txt size={36} weight={700} serif>
           {title}

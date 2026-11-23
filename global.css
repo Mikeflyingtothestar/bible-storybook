@@ -28,6 +28,26 @@ body,
   transition: transform 0.25s ease;
 }
 
+[data-illuminated='1'] {
+  display: inline;
+}
+
+[data-illuminated='1']::first-letter {
+  font-family: Playfair_700, Georgia, serif;
+  font-size: 2.2em;
+  line-height: 0.8;
+  color: #6a5310;
+  margin-right: 0.06em;
+}
+
+html[data-theme='dark'] [data-illuminated='1']::first-letter {
+  color: #e3c77a;
+}
+
+html[data-theme='sepia'] [data-illuminated='1']::first-letter {
+  color: #5e4510;
+}
+
 [data-lift='1']:hover {
   transform: translateY(-4px);
 }
