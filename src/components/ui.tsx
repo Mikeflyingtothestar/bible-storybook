@@ -51,6 +51,7 @@ export function Txt({
   serif = false,
   color,
   style,
+  illuminated = false,
 }: {
   children: React.ReactNode
   size?: number
@@ -58,10 +59,13 @@ export function Txt({
   serif?: boolean
   color?: string
   style?: TextStyle
+  /** Styles the first letter on web. The full string stays in this text node. */
+  illuminated?: boolean
 }) {
   const { colors } = useAppTheme()
   return (
     <Text
+      {...(illuminated && Platform.OS === 'web' ? ({ dataSet: { illuminated: '1' } } as object) : null)}
       style={[
         {
           color: color ?? colors.text,

@@ -139,36 +139,14 @@ export default function ChapterReader() {
                   borderLeftColor: colors.accent,
                 }}
               >
-                <View style={{ flexDirection: 'row', gap: 10, alignItems: 'flex-start' }}>
-                  {verse.number === 1 && /^[A-Za-zÀ-ÿ]/.test(verse.text) ? (
-                    <View
-                      accessibilityElementsHidden
-                      importantForAccessibility="no-hide-descendants"
-                      style={{
-                        width: 46,
-                        height: 50,
-                        borderRadius: 8,
-                        borderWidth: 1,
-                        borderColor: colors.gold,
-                        backgroundColor: colors.surface,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <Txt serif size={Math.round(fontSize * 1.7)} weight={700} color={colors.goldText}>
-                        {verse.text[0]}
-                      </Txt>
-                    </View>
-                  ) : null}
-                  <View style={{ flex: 1 }}>
-                    <Txt serif size={fontSize} style={{ lineHeight: Math.round(fontSize * 1.75) }}>
-                      <Txt serif size={Math.max(12, Math.round(fontSize * 0.62))} weight={700} color={colors.accent}>
-                        {verse.number}{' '}
-                      </Txt>
-                      {verse.number === 1 && /^[A-Za-zÀ-ÿ]/.test(verse.text) ? verse.text.slice(1) : verse.text}
-                    </Txt>
-                  </View>
-                </View>
+                <Txt serif size={fontSize} style={{ lineHeight: Math.round(fontSize * 1.75) }}>
+                  <Txt serif size={Math.max(12, Math.round(fontSize * 0.62))} weight={700} color={colors.accent}>
+                    {verse.number}{' '}
+                  </Txt>
+                  <Txt serif size={fontSize} illuminated={verse.number === 1 && /^[A-Za-zÀ-ÿ]/.test(verse.text)} style={{ lineHeight: Math.round(fontSize * 1.75) }}>
+                    {verse.text}
+                  </Txt>
+                </Txt>
               </Pressable>
             )
           })}
