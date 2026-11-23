@@ -9,8 +9,19 @@ body,
 }
 
 :focus-visible {
-  outline: 2px solid #5261e6;
-  outline-offset: 2px;
+  outline: 2px solid #4f46e5;
+  outline-offset: 3px;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

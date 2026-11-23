@@ -1,12 +1,5 @@
 import '../global.css'
 
-import { Nunito_400Regular } from '@expo-google-fonts/nunito/400Regular'
-import { Nunito_600SemiBold } from '@expo-google-fonts/nunito/600SemiBold'
-import { Nunito_700Bold } from '@expo-google-fonts/nunito/700Bold'
-import { Nunito_800ExtraBold } from '@expo-google-fonts/nunito/800ExtraBold'
-import { Literata_400Regular } from '@expo-google-fonts/literata/400Regular'
-import { Literata_600SemiBold } from '@expo-google-fonts/literata/600SemiBold'
-import { Literata_700Bold } from '@expo-google-fonts/literata/700Bold'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useFonts } from 'expo-font'
 import { Stack } from 'expo-router'
@@ -25,13 +18,11 @@ const queryClient = new QueryClient({
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
-    Nunito_400Regular,
-    Nunito_600SemiBold,
-    Nunito_700Bold,
-    Nunito_800ExtraBold,
-    Literata_400Regular,
-    Literata_600SemiBold,
-    Literata_700Bold,
+    Inter_400: require('../assets/fonts/Inter_400.ttf'),
+    Inter_600: require('../assets/fonts/Inter_600.ttf'),
+    Inter_700: require('../assets/fonts/Inter_700.ttf'),
+    Playfair_500: require('../assets/fonts/Playfair_500.ttf'),
+    Playfair_700: require('../assets/fonts/Playfair_700.ttf'),
   })
 
   useEffect(() => {

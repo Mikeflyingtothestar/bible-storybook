@@ -12,8 +12,8 @@ export default function TabLayout() {
         headerShown: false,
         tabBarActiveTintColor: colors.accent,
         tabBarInactiveTintColor: colors.muted,
-        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.border, minHeight: 60 },
-        tabBarLabelStyle: { fontFamily: fontSans(700), fontSize: 12 },
+        tabBarStyle: { backgroundColor: colors.bg, borderTopColor: colors.border, minHeight: 64, paddingTop: 6 },
+        tabBarLabelStyle: { fontFamily: fontSans(600), fontSize: 11, letterSpacing: 0.2 },
       }}
     >
       <Tabs.Screen name="home" options={{ title: 'Home', tabBarIcon: ({ color }) => <Feather name="home" color={String(color)} size={22} /> }} />

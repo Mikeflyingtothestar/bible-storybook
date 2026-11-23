@@ -1,21 +1,20 @@
 import Feather from '@expo/vector-icons/Feather'
 import { Link, type Href } from 'expo-router'
+import { forwardRef, type ComponentProps } from 'react'
 import { Platform, Pressable, ScrollView, Text, TextInput, View, type TextStyle, type ViewStyle } from 'react-native'
 
 import { useAppTheme } from '../theme/ThemeProvider'
 import type { ThemeColors } from '../theme/tokens'
 
 export function fontSans(weight: 400 | 600 | 700 | 800 = 400): string | undefined {
-  if (weight === 800) return Platform.OS === 'web' ? 'Nunito_800ExtraBold, Nunito, sans-serif' : 'Nunito_800ExtraBold'
-  if (weight === 700) return Platform.OS === 'web' ? 'Nunito_700Bold, Nunito, sans-serif' : 'Nunito_700Bold'
-  if (weight === 600) return Platform.OS === 'web' ? 'Nunito_600SemiBold, Nunito, sans-serif' : 'Nunito_600SemiBold'
-  return Platform.OS === 'web' ? 'Nunito_400Regular, Nunito, sans-serif' : 'Nunito_400Regular'
+  if (weight >= 700) return Platform.OS === 'web' ? 'Inter_700, Inter, sans-serif' : 'Inter_700'
+  if (weight === 600) return Platform.OS === 'web' ? 'Inter_600, Inter, sans-serif' : 'Inter_600'
+  return Platform.OS === 'web' ? 'Inter_400, Inter, sans-serif' : 'Inter_400'
 }
 
 export function fontSerif(weight: 400 | 600 | 700 = 400): string | undefined {
-  if (weight === 700) return Platform.OS === 'web' ? 'Literata_700Bold, Georgia, serif' : 'Literata_700Bold'
-  if (weight === 600) return Platform.OS === 'web' ? 'Literata_600SemiBold, Georgia, serif' : 'Literata_600SemiBold'
-  return Platform.OS === 'web' ? 'Literata_400Regular, Georgia, serif' : 'Literata_400Regular'
+  if (weight >= 700) return Platform.OS === 'web' ? 'Playfair_700, Georgia, serif' : 'Playfair_700'
+  return Platform.OS === 'web' ? 'Playfair_500, Georgia, serif' : 'Playfair_500'
 }
 
 export function Screen({
@@ -78,45 +77,50 @@ export function Txt({
   )
 }
 
-export function Button({
-  label,
-  onPress,
-  variant = 'primary',
-  testID,
-  disabled,
-}: {
+type ButtonProps = Omit<ComponentProps<typeof Pressable>, 'children'> & {
   label: string
-  onPress?: () => void
   variant?: 'primary' | 'quiet' | 'danger'
-  testID?: string
-  disabled?: boolean
-}) {
+  /** Web address passed by expo-router Link. Pressable turns this into a real anchor. */
+  href?: string
+  /** Web click handler passed by expo-router Link (`asChild` uses onClick, not onPress). */
+  onClick?: (event: unknown) => void
+}
+
+export const Button = forwardRef<View, ButtonProps>(function Button(
+  { label, variant = 'primary', testID, disabled, style, href, onClick, ...rest },
+  ref,
+) {
   const { colors } = useAppTheme()
-  const background = variant === 'primary' ? colors.accent : variant === 'danger' ? colors.surface : colors.surface
+  const background = variant === 'primary' ? colors.accent : colors.surface
   const text = variant === 'primary' ? colors.onAccent : variant === 'danger' ? colors.danger : colors.text
   return (
     <Pressable
+      ref={ref as never}
       accessibilityRole="button"
       accessibilityLabel={label}
       testID={testID}
       disabled={disabled}
-      onPress={onPress}
-      style={({ pressed }) => ({
-        minHeight: 48,
-        paddingHorizontal: 18,
-        borderRadius: 14,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: background,
-        borderWidth: variant === 'primary' ? 0 : 1,
-        borderColor: colors.border,
-        opacity: disabled ? 0.5 : pressed ? 0.85 : 1,
-      })}
+      {...rest}
+      {...({ href, onClick } as object)}
+      style={(state) => [
+        typeof style === 'function' ? style(state) : style,
+        {
+          minHeight: 48,
+          paddingHorizontal: 22,
+          borderRadius: 999,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: background,
+          borderWidth: variant === 'primary' ? 0 : 1,
+          borderColor: variant === 'danger' ? colors.danger : colors.border,
+          opacity: disabled ? 0.5 : state.pressed ? 0.88 : 1,
+        },
+      ]}
     >
-      <Text style={{ color: text, fontFamily: fontSans(700), fontSize: 16 }}>{label}</Text>
+      <Text style={{ color: text, fontFamily: fontSans(700), fontSize: 15, letterSpacing: 0.2 }}>{label}</Text>
     </Pressable>
   )
-}
+})
 
 export function Field({
   label,
@@ -175,8 +179,8 @@ export function Card({ children, style }: { children: React.ReactNode; style?: V
       style={[
         {
           backgroundColor: colors.surface,
-          borderRadius: 16,
-          padding: 18,
+          borderRadius: 24,
+          padding: 22,
           borderWidth: 1,
           borderColor: colors.border,
           gap: 8,
