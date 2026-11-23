@@ -3,6 +3,7 @@ import { Platform, Pressable, View, type ViewStyle } from 'react-native'
 
 import { useAppTheme } from '@/src/theme/ThemeProvider'
 
+import { Wordmark } from './Motifs'
 import { Txt } from './ui'
 
 const LINKS = [
@@ -35,7 +36,7 @@ export function WebNav() {
     >
       <Link href="/" asChild>
         <Pressable accessibilityRole="link" accessibilityLabel="Bible Storybook home">
-          <Txt weight={700}>Bible Storybook</Txt>
+          <Wordmark />
         </Pressable>
       </Link>
       <View style={{ flexDirection: 'row', gap: 4, flexWrap: 'wrap' }}>
