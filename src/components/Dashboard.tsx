@@ -116,11 +116,11 @@ export function Dashboard() {
 function Stat({ label, value, detail }: { label: string; value: string; detail: string }) {
   const { colors } = useAppTheme()
   return (
-    <Card style={{ width: 220, flexGrow: 1 }}>
-      <Txt size={14} weight={700} color={colors.muted}>
-        {label}
+    <Card style={{ minWidth: 200, flexBasis: '46%', flexGrow: 1, borderTopWidth: 3, borderTopColor: colors.accent }}>
+      <Txt size={13} weight={700} color={colors.muted} style={{ letterSpacing: 0.6 }}>
+        {label.toUpperCase()}
       </Txt>
-      <Txt size={28} weight={800}>
+      <Txt size={32} weight={700} serif>
         {value}
       </Txt>
       <Txt color={colors.muted}>{detail}</Txt>

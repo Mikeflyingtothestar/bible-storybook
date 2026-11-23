@@ -31,8 +31,8 @@ export default function StoriesScreen() {
         </View>
         {rows.map((story) => (
           <Link key={story.slug} href={`/stories/${story.slug}`} asChild>
-            <Pressable accessibilityRole="link" accessibilityLabel={story.title} style={{ padding: 16, borderRadius: 16, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, gap: 4 }}>
-              <Txt weight={800}>{story.title}</Txt>
+            <Pressable accessibilityRole="link" accessibilityLabel={story.title} style={{ padding: 22, borderRadius: 24, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderLeftWidth: 3, borderLeftColor: colors.accent, gap: 6 }}>
+              <Txt size={22} weight={700} serif>{story.title}</Txt>
               <Txt color={colors.muted}>{story.summary}</Txt>
             </Pressable>
           </Link>

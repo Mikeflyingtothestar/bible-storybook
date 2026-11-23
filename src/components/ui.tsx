@@ -184,6 +184,7 @@ export function Card({ children, style }: { children: React.ReactNode; style?: V
           borderWidth: 1,
           borderColor: colors.border,
           gap: 8,
+          ...(Platform.OS === 'web' ? { boxShadow: '0 12px 32px rgba(18, 18, 26, 0.05)' } : null),
         },
         style,
       ]}
