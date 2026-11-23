@@ -139,7 +139,7 @@ export default function ChapterReader() {
                   borderLeftColor: colors.accent,
                 }}
               >
-                <Txt serif size={fontSize}>
+                <Txt serif size={fontSize} style={{ lineHeight: Math.round(fontSize * 1.75) }}>
                   <Txt serif size={Math.max(12, Math.round(fontSize * 0.62))} weight={700} color={colors.accent}>
                     {verse.number}{' '}
                   </Txt>
