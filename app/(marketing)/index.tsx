@@ -2,7 +2,7 @@ import { Link } from 'expo-router'
 import { useState, type ReactNode } from 'react'
 import { Platform, Pressable, View, type ViewStyle } from 'react-native'
 
-import { ART_SOURCES } from '@/src/art/images'
+import { ART_SOURCES, HERO_BASILICA } from '@/src/art/images'
 import { ARTWORKS } from '@/src/art/works'
 import { ArtImage, CommonsLink } from '@/src/components/ArtworkFrame'
 import { OliveSprig, RoseWindow, Wordmark } from '@/src/components/Motifs'
@@ -90,26 +90,16 @@ function ReaderMock({ dark }: { dark?: boolean }) {
 
 function BookScene() {
   return (
-    <View style={{ height: 520, borderRadius: 36, overflow: 'hidden', backgroundColor: '#16132A' }}>
-      <View style={{ position: 'absolute', width: 420, height: 420, borderRadius: 210, backgroundColor: '#6D5BFF', top: -80, right: -40, opacity: 0.9 }} />
-      <View style={{ position: 'absolute', width: 260, height: 260, borderRadius: 130, backgroundColor: '#A79BFF', top: 40, right: 120, opacity: 0.7 }} />
-      <View style={{ position: 'absolute', width: 180, height: 180, borderRadius: 90, backgroundColor: '#F3E2B3', top: 150, left: 70, opacity: 0.85 }} />
-      <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 150, backgroundColor: '#0E0C18' }} />
-      <View style={{ position: 'absolute', left: 48, right: 48, bottom: 78, height: 150, flexDirection: 'row', gap: 6 }}>
-        <View style={{ flex: 1, backgroundColor: '#F7F1E4', borderTopLeftRadius: 8, borderBottomLeftRadius: 10, padding: 16, gap: 8 }}>
-          <View style={{ height: 8, width: '70%', backgroundColor: '#D9D0EA', borderRadius: 4 }} />
-          <View style={{ height: 8, width: '88%', backgroundColor: '#E7E1F4', borderRadius: 4 }} />
-          <View style={{ height: 8, width: '60%', backgroundColor: '#E7E1F4', borderRadius: 4 }} />
-        </View>
-        <View style={{ flex: 1, backgroundColor: '#FFFDF8', borderTopRightRadius: 8, borderBottomRightRadius: 10, padding: 16, gap: 8 }}>
-          <View style={{ height: 8, width: '76%', backgroundColor: '#E4DDF3', borderRadius: 4 }} />
-          <View style={{ height: 8, width: '90%', backgroundColor: '#EFEAF8', borderRadius: 4 }} />
-          <View style={{ height: 8, width: '54%', backgroundColor: '#EFEAF8', borderRadius: 4 }} />
-        </View>
-      </View>
-      <View style={{ position: 'absolute', top: 22, left: 22, width: 84, height: 112, borderRadius: 8, overflow: 'hidden', borderWidth: 2, borderColor: '#E7D7A4' }}>
-        <ArtImage source={ART_SOURCES.kells} alt="Chi Rho page from the Book of Kells, about 800" eager />
-      </View>
+    <View
+      style={{
+        height: 520,
+        width: '100%',
+        borderRadius: 36,
+        overflow: 'hidden',
+        ...(Platform.OS === 'web' ? ({ boxShadow: '0 18px 40px rgba(18, 18, 26, 0.16)' } as ViewStyle) : null),
+      }}
+    >
+      <ArtImage source={HERO_BASILICA} alt="Da Vinci-style sketch of an ancient basilica crowned with a cross" eager />
     </View>
   )
 }

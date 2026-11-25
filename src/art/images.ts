@@ -10,3 +10,6 @@ export const ART_SOURCES: Record<string, ImageSourcePropType> = {
   rembrandt: require('../../assets/art/rembrandt.webp'),
   dore: require('../../assets/art/dore.webp'),
 }
+
+/** Original illustration for the landing hero. Not part of the Commons gallery. */
+export const HERO_BASILICA = require('../../assets/art/davinci-basilica.webp') as ImageSourcePropType
