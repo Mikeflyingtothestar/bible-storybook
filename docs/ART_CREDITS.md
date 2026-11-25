@@ -15,4 +15,6 @@ The pictures in the “Art through the ages” section are self-hosted WebP copi
 
 Local files live in `assets/art/` and use the same stems: `priscilla.webp`, `ravenna.webp`, `kells.webp`, `giotto.webp`, `rublev.webp`, `angelico.webp`, `rembrandt.webp`, `dore.webp`.
 
-The Chi Rho page is also shown small in the landing hero. The rose window and olive sprig elsewhere on the page are original SVG drawings, not reproductions of a manuscript.
+The landing hero is a separate picture, `assets/art/davinci-basilica.webp`. It is an original AI-generated illustration made for this project: a sepia sketch of a domed basilica crowned with a cross, in the manner of a Renaissance study. It is not a Wikimedia file and not a reproduction of a historical drawing.
+
+The rose window and olive sprig elsewhere on the page are original SVG drawings, not reproductions of a manuscript.
