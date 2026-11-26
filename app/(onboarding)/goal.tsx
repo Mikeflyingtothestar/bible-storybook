@@ -13,10 +13,10 @@ export default function ChooseGoal() {
   const { colors } = useAppTheme()
   return (
     <OnboardingStep
-      step="3 of 4"
+      step="3 of 5"
       title="A gentle daily aim"
       body="This stays on this device. It is a reminder, not a target you can fail."
-      next="/profile"
+      next="/intentions"
     >
       <View style={{ flexDirection: 'row', gap: 8 }}>
         {GOALS.map((minutes) => {

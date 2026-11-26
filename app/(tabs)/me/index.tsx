@@ -1,4 +1,4 @@
-import { Link } from 'expo-router'
+import { Link, type Href } from 'expo-router'
 import { Pressable, View } from 'react-native'
 
 import { useAuth } from '@/src/auth/AuthProvider'
@@ -19,11 +19,15 @@ export default function MeScreen() {
         </Txt>
         <Dashboard />
         <View style={{ gap: 8 }}>
+          <Nav href="/learn" label="Learn" />
+          <Nav href="/stories" label="Stories" />
+          <Nav href="/bedtime" label="Sleep" />
+          <Nav href="/family" label="Family profiles" />
           <Nav href="/me/journey" label="Faith Journey" />
           <Nav href="/me/bookmarks" label="Bookmarks" />
           <Nav href="/me/highlights" label="Highlights and notes" />
           <Nav href="/me/settings" label="Settings" />
-          <Nav href="/paywall" label="Plans" />
+          <Nav href="/paywall" label="Pricing" />
         </View>
         {user ? (
           <Pressable
@@ -48,13 +52,15 @@ export default function MeScreen() {
   )
 }
 
-function Nav({ href, label }: { href: '/me/journey' | '/me/bookmarks' | '/me/highlights' | '/me/settings' | '/paywall'; label: string }) {
+function Nav({ href, label }: { href: Href; label: string }) {
   const { colors } = useAppTheme()
   return (
-    <Link href={href}>
-      <Txt weight={700} color={colors.accent}>
-        {label}
-      </Txt>
+    <Link href={href} asChild>
+      <Pressable accessibilityRole="link" accessibilityLabel={label} style={{ minHeight: 44, justifyContent: 'center' }}>
+        <Txt weight={700} color={colors.accent}>
+          {label}
+        </Txt>
+      </Pressable>
     </Link>
   )
 }

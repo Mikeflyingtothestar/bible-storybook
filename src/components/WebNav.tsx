@@ -7,11 +7,12 @@ import { Wordmark } from './Motifs'
 import { Txt } from './ui'
 
 const LINKS = [
-  { href: '/home' as const, label: 'Home' },
+  { href: '/home' as const, label: 'Today' },
   { href: '/bible' as const, label: 'Bible' },
-  { href: '/stories' as const, label: 'Stories' },
-  { href: '/family' as const, label: 'Family' },
-  { href: '/me' as const, label: 'Me' },
+  { href: '/companion' as const, label: 'Companion' },
+  { href: '/pray' as const, label: 'Pray' },
+  { href: '/journal' as const, label: 'Journal' },
+  { href: '/me' as const, label: 'More' },
 ]
 
 export function WebNav() {
@@ -47,7 +48,7 @@ export function WebNav() {
               <Pressable
                 accessibilityRole="link"
                 accessibilityState={{ selected: active }}
-                style={{ minHeight: 40, paddingHorizontal: 14, borderRadius: 999, justifyContent: 'center', backgroundColor: active ? colors.accent : 'transparent' }}
+                style={{ minHeight: 44, paddingHorizontal: 14, borderRadius: 999, justifyContent: 'center', backgroundColor: active ? colors.accent : 'transparent' }}
               >
                 <Txt weight={600} color={active ? colors.onAccent : colors.text}>
                   {item.label}

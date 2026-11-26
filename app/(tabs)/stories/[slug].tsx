@@ -1,7 +1,8 @@
 import { Link, useLocalSearchParams } from 'expo-router'
 import { View } from 'react-native'
 
-import { AppBar, Column, Screen, Txt } from '@/src/components/ui'
+import { AppBar, Button, Column, Screen, Txt } from '@/src/components/ui'
+import { speakText } from '@/src/voice/speak'
 import { useEntitlement } from '@/src/entitlement/useEntitlement'
 import { STORIES } from '@/src/stories/catalog'
 import { useAppTheme } from '@/src/theme/ThemeProvider'
@@ -27,8 +28,9 @@ export default function StoryDetail() {
       <AppBar title={story.title} backHref="/stories" />
       <Column width={720} style={{ gap: 14 }}>
         <Txt color={colors.muted}>{story.summary}</Txt>
+        <Button label="Listen to the story" onPress={() => speakText(story.scenes.map((scene) => scene.narration).join(' '))} />
         <Txt color={colors.muted}>
-          Pictures are still being prepared. {video === 'flag-off' ? 'Video stories are coming soon.' : video === 'upgrade' ? 'Video is a Premium feature.' : 'Video is available for this tier.'}
+          Listen first. {video === 'flag-off' ? 'Pictures and video are part of Premium.' : video === 'upgrade' ? 'Video is a Premium feature.' : 'Video is included for you.'}
         </Txt>
         {video === 'upgrade' ? (
           <Link href="/paywall">
@@ -40,7 +42,7 @@ export default function StoryDetail() {
         {story.scenes.map((scene, index) => (
           <View key={scene.verseRef + index} style={{ gap: 6, padding: 16, borderRadius: 16, backgroundColor: colors.surface }}>
             <View style={{ height: 120, borderRadius: 12, backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center' }}>
-              <Txt color={colors.muted}>Illustration coming soon</Txt>
+              <Txt color={colors.muted}>Listen</Txt>
             </View>
             <Txt weight={800}>{scene.caption}</Txt>
             <Txt serif>{scene.narration}</Txt>

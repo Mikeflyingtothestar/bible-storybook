@@ -1,4 +1,4 @@
-export const SLEEP_TIMER_CHOICES = [5, 10, 15, 30, 45, 60, 90, 120] as const
+export const SLEEP_TIMER_CHOICES = [2, 5, 10, 15, 30, 45, 60, 90, 120] as const
 
 export function timerRemainingMs(endsAt: number, now: number): number {
   return Math.max(0, endsAt - now)

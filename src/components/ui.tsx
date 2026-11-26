@@ -2,6 +2,7 @@ import Feather from '@expo/vector-icons/Feather'
 import { Link, type Href } from 'expo-router'
 import { forwardRef, type ComponentProps } from 'react'
 import { Platform, Pressable, ScrollView, Text, TextInput, View, type TextStyle, type ViewStyle } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { useAppTheme } from '../theme/ThemeProvider'
 import type { ThemeColors } from '../theme/tokens'
@@ -27,10 +28,11 @@ export function Screen({
   testID?: string
 }) {
   const { colors } = useAppTheme()
+  const insets = useSafeAreaInsets()
   return (
-    <View testID={testID} style={{ flex: 1, backgroundColor: colors.bg }} className="flex-1">
+    <View testID={testID} style={{ flex: 1, backgroundColor: colors.bg, paddingTop: insets.top }} className="flex-1">
       {scroll ? (
-        <ScrollView contentContainerStyle={{ paddingBottom: 48 }} keyboardShouldPersistTaps="handled">
+        <ScrollView contentContainerStyle={{ paddingBottom: Math.max(32, insets.bottom + 24) }} keyboardShouldPersistTaps="handled">
           {children}
         </ScrollView>
       ) : (

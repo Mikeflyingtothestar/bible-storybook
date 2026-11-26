@@ -17,7 +17,7 @@ export function useEntitlement() {
   const flags = useQuery({
     queryKey: ['flags'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('feature_flags').select('key, enabled')
+      const { data, error } = await supabase.from('feature_flags').select('key, enabled').limit(20)
       if (error || !data) return {} as Record<string, boolean>
       return Object.fromEntries((data as FlagRow[]).map((row) => [row.key, row.enabled]))
     },
