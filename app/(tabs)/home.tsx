@@ -1,3 +1,4 @@
+import Feather from '@expo/vector-icons/Feather'
 import { Link } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { Pressable, View } from 'react-native'
@@ -71,20 +72,22 @@ export default function TodayScreen() {
           </View>
           <ProgressRing done={Number(checks.verse) + Number(checks.teaching) + Number(checks.prayer)} total={3} />
         </View>
-        <View style={{ borderRadius: 28, overflow: 'hidden', position: 'relative' }}>
-          <Photo source={NATURE.sunrise} alt="Sunrise behind the daily verse" height={260} radius={28} />
-          <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: 18, gap: 8, backgroundColor: 'rgba(18,22,20,0.5)' }}>
-            <Txt weight={700} color="#F4F1EA">Daily verse</Txt>
-            <Txt serif size={22} color="#F4F1EA">{teaching.verse.text}</Txt>
-            <Txt color="#E7E1D6">{teaching.verse.label}</Txt>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-            <Pressable accessibilityRole="button" accessibilityLabel="Like this verse" onPress={() => { markToday(day, 'verse'); setLikedVerse(liked === teaching.verse.osisRef ? null : teaching.verse.osisRef) }} style={{ minHeight: 44, justifyContent: 'center', paddingHorizontal: 8 }}>
-              <Txt weight={700} color="#F4F1EA">{liked === teaching.verse.osisRef ? 'Liked' : 'Like'}</Txt>
-            </Pressable>
-            <Pressable accessibilityRole="button" accessibilityLabel="Share verse as an image" onPress={() => void share()} style={{ minHeight: 44, justifyContent: 'center', paddingHorizontal: 8 }}>
-              <Txt weight={700} color="#F4F1EA">Share image</Txt>
-            </Pressable>
-          </View>
+        <View style={{ borderRadius: 28, overflow: 'hidden', position: 'relative', minHeight: 280 }}>
+          <Photo source={NATURE.sunrise} alt="Sunrise behind the daily verse" height={280} radius={28} />
+          <View style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, padding: 20, justifyContent: 'flex-end', gap: 12, backgroundColor: 'rgba(12,16,14,0.55)' }}>
+            <Txt weight={700} color="#F7F4EE">Daily verse</Txt>
+            <Txt serif size={teaching.verse.text.length > 110 ? 18 : 22} color="#F7F4EE" style={{ lineHeight: teaching.verse.text.length > 110 ? 26 : 30 }}>
+              {teaching.verse.text}
+            </Txt>
+            <Txt color="#F7F4EE">{teaching.verse.label}</Txt>
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <Pressable accessibilityRole="button" accessibilityLabel="Like this verse" onPress={() => { markToday(day, 'verse'); setLikedVerse(liked === teaching.verse.osisRef ? null : teaching.verse.osisRef) }} style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(247,244,238,0.94)', alignItems: 'center', justifyContent: 'center' }}>
+                <Feather name="heart" size={18} color={liked === teaching.verse.osisRef ? '#0E6B56' : '#1C1917'} />
+              </Pressable>
+              <Pressable accessibilityRole="button" accessibilityLabel="Share verse as an image" onPress={() => void share()} style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(247,244,238,0.94)', alignItems: 'center', justifyContent: 'center' }}>
+                <Feather name="share" size={18} color="#1C1917" />
+              </Pressable>
+            </View>
           </View>
         </View>
         {shareNote ? <Txt color={colors.muted}>{shareNote}</Txt> : null}

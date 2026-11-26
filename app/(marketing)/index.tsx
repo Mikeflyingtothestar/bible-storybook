@@ -96,7 +96,7 @@ export default function LandingPage() {
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 28, alignItems: 'center', paddingTop: 20 }}>
           <View style={{ flexGrow: 1, flexBasis: 320, minWidth: 0, maxWidth: 560, gap: 18 }}>
             <Txt size={14} weight={700} color={colors.accent} style={{ letterSpacing: 1.4 }}>DAILY VERSE</Txt>
-            <Txt size={58} weight={700} serif style={{ letterSpacing: -1.2 }}>The Bible, told like a story</Txt>
+            <Txt size={46} weight={700} serif style={{ letterSpacing: -0.8, ...(Platform.OS === 'web' ? ({ textWrap: 'balance' } as object) : null) }}>The Bible, told like a story</Txt>
             <Txt size={18} color={colors.muted} style={{ lineHeight: 28 }}>A few quiet minutes for faith, calm and reflection. Read a daily verse, listen when you want, and rest when the day is done.</Txt>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
               <Link href="/bible" asChild><Button label="Open the reader" testID="open-reader" /></Link>
@@ -130,7 +130,7 @@ export default function LandingPage() {
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16, marginTop: 24 }}>
             {FEATURES.map((feature) => (
               <View key={feature.title} {...lift} style={{ flexGrow: 1, flexBasis: 240, minWidth: 0, backgroundColor: colors.surface, borderRadius: 24, overflow: 'hidden', borderWidth: 1, borderColor: colors.border }}>
-                <Photo source={NATURE[feature.image]} alt="" height={120} radius={0} />
+                <Photo source={NATURE[feature.image]} alt={`${feature.title} illustration`} height={132} radius={0} />
                 <View style={{ padding: 18, gap: 8 }}>
                   <Feather name={feature.icon} size={20} color={colors.accent} />
                   <Txt size={22} weight={700} serif>{feature.title}</Txt>

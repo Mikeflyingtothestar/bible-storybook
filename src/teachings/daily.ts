@@ -10,14 +10,14 @@ export type DailyTeaching = {
 }
 
 const REFLECTIONS: Record<TopicId, string> = {
-  anxiety: 'The verse names worry and then points you back to today, not to tomorrow.',
-  forgiveness: 'The prayer asks to be forgiven in the same breath that it asks us to forgive.',
-  grief: 'The psalm does not deny the valley. It says the speaker is not walking it alone.',
-  purpose: 'The text starts with being made, and with a life that is called light.',
-  gratitude: 'Goodness, in this verse, is something that follows rather than something you earn.',
-  rest: 'The picture is simple: green pasture, still water, a soul restored.',
-  courage: 'Courage here is not the absence of a dark valley. It is company inside it.',
-  peace: 'Help, in this psalm, is located with the one who made heaven and earth.',
+  anxiety: 'You do not have to settle tomorrow before this day is over. The verse brings you back to what is in front of you, and that is enough for now.',
+  forgiveness: 'The prayer asks to be forgiven and to forgive in the same breath. You can start with one small release, even if the rest still hurts.',
+  grief: 'The psalm does not pretend the valley is gone. It says you are not walking it by yourself, and you can go as slowly as you need.',
+  purpose: 'You were made, and the text calls that life a light. You do not have to prove your worth before you take the next quiet step.',
+  gratitude: 'Goodness in this verse follows you. It is not a prize you have to earn before the day can be kind.',
+  rest: 'Picture a green field and water that is not rushing. Your soul is allowed to be restored without a performance.',
+  courage: 'Courage here is not the absence of a dark place. It is company while you walk through it, one step at a time.',
+  peace: 'The help in this psalm is steady, like the one who made heaven and earth. You can set the worry down for a minute.',
 }
 
 export function dayKey(date: Date): string {
@@ -42,13 +42,13 @@ export function dailyTeaching(chosen: readonly TopicId[], date: Date): DailyTeac
 }
 
 const WEEK_LINES = [
-  'Start with the verse alone. One sentence is enough.',
-  'Read it once more, slowly, and notice one word.',
-  'Say the verse out loud if you want. Silence is fine too.',
-  'Carry one phrase into the next ordinary task.',
-  'If your mind wanders, come back to the same line.',
-  'Let the verse sit beside whatever the day already is.',
-  'Close the week by thanking the text for being short.',
+  'Start with the verse by itself. One sentence is a complete practice. You can close the app after that.',
+  'Read it once more, a little slower, and notice a single word that stays with you. There is no grade at the end.',
+  'If you want, say the line out loud. If you would rather sit in silence, that counts too.',
+  'Take one phrase with you into the next ordinary thing you do. Let it be small enough to carry.',
+  'When your mind wanders, come back to the same line. Wandering is part of reading, not a failure.',
+  'Let the verse sit beside whatever today already is. You do not have to make the day prettier first.',
+  'Close the week by thanking the text for being short. Seven days of a few minutes is a real rhythm.',
 ]
 
 /** Seven days of the same personal topic, so a goal shapes the whole week. */
@@ -59,7 +59,7 @@ export function weekTeaching(chosen: readonly TopicId[], date: Date): DailyTeach
   return {
     ...base,
     dayOfWeek: dayOfWeek + 1,
-    reflection: `${base.reflection} ${line}`,
-    listenText: `${base.verse.label}. ${base.verse.text} ${base.reflection} ${line}`,
+    reflection: line,
+    listenText: `${base.verse.label}. ${base.verse.text} ${line}`,
   }
 }

@@ -4,7 +4,7 @@ import { Pressable, useWindowDimensions, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { Wordmark } from '@/src/components/Motifs'
-import { fontSans, Txt } from '@/src/components/ui'
+import { Txt } from '@/src/components/ui'
 import { gratitudeStreak } from '@/src/journal/streak'
 import { usePrefs } from '@/src/preferences/store'
 import { dayKey } from '@/src/teachings/daily'
@@ -61,34 +61,71 @@ export default function TabLayout() {
       {wide ? <Sidebar /> : null}
       <View style={{ flex: 1 }}>
         <Tabs
+          tabBar={(props) => {
+            const bar = props as unknown as { state: { index: number; routes: { key: string; name: string }[] }; navigation: { navigate: (name: string) => void } }
+            return wide ? <View /> : <PhoneTabs state={bar.state} navigation={bar.navigation} bottom={insets.bottom} />
+          }}
           screenOptions={{
             headerShown: false,
             tabBarActiveTintColor: colors.accent,
             tabBarInactiveTintColor: colors.muted,
-            tabBarStyle: wide
-              ? { display: 'none' }
-              : {
-                  backgroundColor: colors.bg,
-                  borderTopColor: colors.border,
-                  minHeight: 64 + insets.bottom,
-                  paddingTop: 8,
-                  paddingBottom: Math.max(insets.bottom, 10),
-                },
-            tabBarShowLabel: true,
-            tabBarLabelStyle: { fontFamily: fontSans(600), fontSize: 11 },
           }}
         >
-          <Tabs.Screen name="home" options={{ title: 'Today', tabBarIcon: ({ color }) => <Feather name="sun" color={String(color)} size={22} /> }} />
-          <Tabs.Screen name="bible" options={{ title: 'Bible', tabBarIcon: ({ color }) => <Feather name="book-open" color={String(color)} size={22} /> }} />
-          <Tabs.Screen name="companion" options={{ title: 'Companion', tabBarIcon: ({ color }) => <Feather name="message-circle" color={String(color)} size={22} /> }} />
-          <Tabs.Screen name="pray" options={{ title: 'Pray', tabBarIcon: ({ color }) => <Feather name="feather" color={String(color)} size={22} /> }} />
-          <Tabs.Screen name="journal" options={{ title: 'Journal', tabBarIcon: ({ color }) => <Feather name="edit-3" color={String(color)} size={22} /> }} />
+          <Tabs.Screen name="home" options={{ title: 'Today' }} />
+          <Tabs.Screen name="bible" options={{ title: 'Bible' }} />
+          <Tabs.Screen name="companion" options={{ title: 'Ask' }} />
+          <Tabs.Screen name="pray" options={{ title: 'Pray' }} />
+          <Tabs.Screen name="journal" options={{ title: 'Journal' }} />
           <Tabs.Screen name="stories" options={{ title: 'Stories', tabBarButton: () => null }} />
           <Tabs.Screen name="family" options={{ title: 'Family', tabBarButton: () => null }} />
           <Tabs.Screen name="learn" options={{ title: 'Learn', tabBarButton: () => null }} />
-          <Tabs.Screen name="me" options={{ title: 'More', tabBarIcon: ({ color }) => <Feather name="grid" color={String(color)} size={22} /> }} />
+          <Tabs.Screen name="me" options={{ title: 'More' }} />
         </Tabs>
       </View>
+    </View>
+  )
+}
+
+const PHONE_TABS = [
+  { name: 'home', label: 'Today', icon: 'sun' as const },
+  { name: 'bible', label: 'Bible', icon: 'book-open' as const },
+  { name: 'companion', label: 'Ask', icon: 'message-circle' as const },
+  { name: 'pray', label: 'Pray', icon: 'feather' as const },
+  { name: 'journal', label: 'Journal', icon: 'edit-3' as const },
+  { name: 'me', label: 'More', icon: 'grid' as const },
+]
+
+function PhoneTabs({
+  state,
+  navigation,
+  bottom,
+}: {
+  state: { index: number; routes: { key: string; name: string }[] }
+  navigation: { navigate: (name: string) => void }
+  bottom: number
+}) {
+  const { colors } = useAppTheme()
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'stretch', backgroundColor: colors.bg, borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 6, paddingBottom: Math.max(bottom, 8) }}>
+      {PHONE_TABS.map((item) => {
+        const index = state.routes.findIndex((route) => route.name === item.name)
+        const active = state.index === index
+        return (
+          <Pressable
+            key={item.name}
+            accessibilityRole="tab"
+            accessibilityLabel={item.label}
+            accessibilityState={{ selected: active }}
+            onPress={() => navigation.navigate(item.name)}
+            style={{ flex: 1, minWidth: 0, minHeight: 52, alignItems: 'center', justifyContent: 'center', gap: 2, paddingHorizontal: 2 }}
+          >
+            <Feather name={item.icon} size={20} color={active ? colors.accent : colors.muted} />
+            <Txt size={12} weight={600} color={active ? colors.accent : colors.muted} style={{ textAlign: 'center' }}>
+              {item.label}
+            </Txt>
+          </Pressable>
+        )
+      })}
     </View>
   )
 }

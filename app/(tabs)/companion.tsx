@@ -1,15 +1,18 @@
 import { useState } from 'react'
-import { Pressable, TextInput, View } from 'react-native'
+import { Platform, Pressable, ScrollView, TextInput, View, type ViewStyle } from 'react-native'
 
-import { answerQuestion, COMPANION_DISCLAIMER, type CompanionResult } from '@/src/companion/answer'
+import { answerQuestion, type CompanionResult } from '@/src/companion/answer'
 import { callCompanionLlm } from '@/src/companion/llm'
-import { AppBar, Card, Column, Screen, Txt, fontSans } from '@/src/components/ui'
+import { NATURE } from '@/src/art/images'
+import { AppBar, Card, Screen, Txt, fontSans } from '@/src/components/ui'
+import { Photo } from '@/src/components/Photo'
 import { usePrefs } from '@/src/preferences/store'
 import { dayKey } from '@/src/teachings/daily'
 import { useAppTheme } from '@/src/theme/ThemeProvider'
 import { requireVerse } from '@/src/wellness/bundled'
 
-const BREATH = ['Breathe in for 4', 'Hold for 4', 'Breathe out for 4']
+const PROMPTS = ['I feel anxious', 'Help me rest', 'A verse for grief']
+const BREATH = ['Breathe in', 'Hold', 'Breathe out']
 
 export default function CompanionScreen() {
   const { colors } = useAppTheme()
@@ -18,88 +21,105 @@ export default function CompanionScreen() {
   const noteAsk = usePrefs((state) => state.noteCompanionAsk)
   const [question, setQuestion] = useState('')
   const [result, setResult] = useState<CompanionResult | null>(null)
-  const [calm, setCalm] = useState(0)
+  const [asked, setAsked] = useState('')
   const [typing, setTyping] = useState(false)
+  const [calmOpen, setCalmOpen] = useState(false)
+  const [breath, setBreath] = useState(0)
   const comfort = requireVerse('PSA.23.2')
   const day = dayKey(new Date())
   const used = companionDay === day ? companionCount : 0
   const remaining = Math.max(0, 5 - used)
 
-  async function ask() {
+  async function ask(text?: string) {
+    const query = (text ?? question).trim()
+    if (!query) return
+    setAsked(query)
     setTyping(true)
-    await new Promise((resolve) => setTimeout(resolve, 350))
+    await new Promise((resolve) => setTimeout(resolve, 400))
     setTyping(false)
     if (remaining <= 0) {
-      setResult({ kind: 'need-more', text: 'Five questions are included today. The Calm path below stays open. More questions are marked Premium and are not blocked forever.', disclaimer: COMPANION_DISCLAIMER })
+      setResult({ kind: 'need-more', text: 'Five questions are included today. Calm stays open.', disclaimer: 'Answers quote the Bible. Not pastoral or medical advice.' })
       return
     }
-    const next = answerQuestion(question)
+    const next = answerQuestion(query)
     setResult(next)
     if (next.kind === 'answer') {
       noteAsk(day)
-      await callCompanionLlm({ question, citations: next.citations })
+      await callCompanionLlm({ question: query, citations: next.citations })
     }
   }
 
   return (
-    <Screen testID="companion">
-      <AppBar title="Companion" />
-      <Column width={720} style={{ gap: 14 }}>
-        <Txt size={32} weight={700} serif>
-          Ask in plain words
-        </Txt>
-        <Txt color={colors.muted}>{COMPANION_DISCLAIMER} It can be wrong. {remaining} of 5 free questions left today. Today itself is never locked behind this.</Txt>
-        <Pressable accessibilityRole="button" accessibilityLabel="Calm and comfort" onPress={() => setCalm((value) => (value + 1) % BREATH.length)} style={{ minHeight: 48, borderRadius: 16, padding: 14, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}>
-          <Txt weight={700}>Calm / Comfort</Txt>
-          <Txt>{BREATH[calm]}</Txt>
-          <Txt color={colors.muted}>
-            {comfort.label}: {comfort.text}
-          </Txt>
-        </Pressable>
-        <TextInput
-          accessibilityLabel="Question"
-          value={question}
-          onChangeText={setQuestion}
-          placeholder="For example, worry or rest"
-          placeholderTextColor={colors.muted}
-          style={{ minHeight: 48, borderWidth: 1, borderColor: colors.border, borderRadius: 14, padding: 12, color: colors.text, fontFamily: fontSans() }}
-        />
-        <Pressable accessibilityRole="button" accessibilityLabel="Ask" onPress={() => void ask()} style={{ minHeight: 48, borderRadius: 999, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
-          <Txt weight={700} color={colors.onAccent}>
-            Ask
-          </Txt>
-        </Pressable>
-        <View style={{ alignSelf: 'flex-start', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}>
-          <Txt size={13} weight={700}>{remaining} left today</Txt>
-        </View>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-          {['I feel anxious', 'Help me rest', 'A verse for grief'].map((prompt) => (
-            <Pressable key={prompt} accessibilityRole="button" onPress={() => setQuestion(prompt)} style={{ minHeight: 44, paddingHorizontal: 12, borderRadius: 999, justifyContent: 'center', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}>
-              <Txt>{prompt}</Txt>
-            </Pressable>
-          ))}
-        </View>
-        {typing ? <Txt color={colors.muted}>…</Txt> : null}
-        {result ? (
-          <View style={{ alignSelf: result.kind === 'answer' ? 'flex-start' : 'flex-start', maxWidth: 560, gap: 8 }}>
-            <View style={{ borderRadius: 20, padding: 14, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}>
-              <Txt>{result.text}</Txt>
-            </View>
-            {result.kind === 'answer'
-              ? result.citations.map((verse) => (
-                  <Card key={verse.osisRef}>
-                    <Txt weight={700} color={colors.accent}>{verse.label}</Txt>
-                    <Txt serif>{verse.text}</Txt>
-                  </Card>
-                ))
-              : null}
-            {result.kind === 'answer' && result.crisis ? (
-              <Txt weight={700}>If you are in danger, contact local emergency services. Befrienders Malaysia and findahelpline.com can help.</Txt>
-            ) : null}
-            <Txt size={13} color={colors.muted}>{result.disclaimer}</Txt>
+    <Screen testID="companion" scroll={false}>
+      <View style={{ flex: 1 }}>
+        <AppBar title="Ask" />
+        <View style={{ paddingHorizontal: 20, paddingBottom: 8, flexDirection: 'row', justifyContent: 'flex-end' }}>
+          <View style={{ borderRadius: 999, paddingHorizontal: 12, minHeight: 32, justifyContent: 'center', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}>
+            <Txt size={13} weight={700}>{remaining} left today</Txt>
           </View>
-        ) : null}
-      </Column>
+        </View>
+        <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 16, gap: 12 }} keyboardShouldPersistTaps="handled">
+          {!result && !typing ? (
+            <View style={{ gap: 12 }}>
+              <Photo source={NATURE.leaves} alt="Soft leaves" height={140} />
+              <Txt size={28} weight={700} serif>What is on your mind?</Txt>
+              <Txt color={colors.muted}>Ask in ordinary words. You will get a verse, not a lecture.</Txt>
+            </View>
+          ) : null}
+          {asked ? (
+            <View style={{ alignSelf: 'flex-end', maxWidth: '85%', borderRadius: 18, padding: 12, backgroundColor: colors.accent }}>
+              <Txt color={colors.onAccent}>{asked}</Txt>
+            </View>
+          ) : null}
+          {typing ? (
+            <View style={{ alignSelf: 'flex-start', borderRadius: 18, padding: 12, backgroundColor: colors.surface }}>
+              <Txt color={colors.muted}>Looking up a verse…</Txt>
+            </View>
+          ) : null}
+          {result ? (
+            <View style={{ alignSelf: 'flex-start', maxWidth: '92%', gap: 8 }}>
+              <View style={{ borderRadius: 18, padding: 14, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}>
+                <Txt>{result.text}</Txt>
+              </View>
+              {result.kind === 'answer'
+                ? result.citations.map((verse) => (
+                    <Card key={verse.osisRef}>
+                      <Txt weight={700} color={colors.accent}>{verse.label}</Txt>
+                      <Txt serif>{verse.text}</Txt>
+                    </Card>
+                  ))
+                : null}
+              {result.kind === 'answer' && result.crisis ? (
+                <Txt weight={700}>If you are in danger, contact local emergency services. Befrienders Malaysia and findahelpline.com can help.</Txt>
+              ) : null}
+            </View>
+          ) : null}
+          <Pressable accessibilityRole="button" accessibilityLabel="Open calm breathing" onPress={() => { setCalmOpen(true); setBreath((value) => (value + 1) % 3) }} style={{ minHeight: 88, borderRadius: 20, padding: 14, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+            <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: colors.accent, ...(Platform.OS === 'web' && calmOpen ? ({ animation: 'breathe 8s ease-in-out infinite' } as ViewStyle) : null) }} />
+            <View style={{ flex: 1 }}>
+              <Txt weight={700}>Calm</Txt>
+              <Txt color={colors.muted}>{calmOpen ? `${BREATH[breath]} · 4 counts` : 'A slow breath and a verse'}</Txt>
+              {calmOpen ? <Txt size={13}>{comfort.label}</Txt> : null}
+            </View>
+          </Pressable>
+        </ScrollView>
+        <View style={{ paddingHorizontal: 16, gap: 8, paddingBottom: 8 }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+            {PROMPTS.map((prompt) => (
+              <Pressable key={prompt} accessibilityRole="button" onPress={() => void ask(prompt)} style={{ minHeight: 40, paddingHorizontal: 12, borderRadius: 999, justifyContent: 'center', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}>
+                <Txt size={14}>{prompt}</Txt>
+              </Pressable>
+            ))}
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, borderWidth: 1, borderColor: colors.border, borderRadius: 999, paddingLeft: 16, paddingRight: 6, backgroundColor: colors.surface }}>
+            <TextInput accessibilityLabel="Question" value={question} onChangeText={setQuestion} placeholder="Ask a question" placeholderTextColor={colors.muted} style={{ flex: 1, minHeight: 48, color: colors.text, fontFamily: fontSans() }} />
+            <Pressable accessibilityRole="button" accessibilityLabel="Send" onPress={() => void ask()} style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
+              <Txt weight={700} color={colors.onAccent}>↑</Txt>
+            </Pressable>
+          </View>
+          <Txt size={12} color={colors.muted} style={{ textAlign: 'center' }}>Answers quote the Bible. Not pastoral or medical advice.</Txt>
+        </View>
+      </View>
     </Screen>
   )
 }
