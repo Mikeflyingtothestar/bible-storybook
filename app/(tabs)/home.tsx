@@ -2,7 +2,10 @@ import { Link } from 'expo-router'
 import { useEffect, useState } from 'react'
 import { Pressable, View } from 'react-native'
 
+import { NATURE } from '@/src/art/images'
 import { AppBar, Button, Card, Column, Screen, Txt } from '@/src/components/ui'
+import { Photo } from '@/src/components/Photo'
+import { ProgressRing } from '@/src/components/ProgressRing'
 import { gratitudeStreak, streakMessage } from '@/src/journal/streak'
 import { prayersFor } from '@/src/prayer/catalog'
 import { usePrefs } from '@/src/preferences/store'
@@ -61,28 +64,30 @@ export default function TodayScreen() {
     <Screen testID="today">
       <AppBar title="Today" />
       <Column width={720} style={{ gap: 16 }}>
-        <Txt size={34} weight={700} serif>
-          Today
-        </Txt>
-        <Txt color={colors.muted}>{streakMessage(streak)}</Txt>
-        <Card>
-          <Txt weight={700} color={colors.accent}>
-            Daily verse
-          </Txt>
-          <Txt serif size={24}>
-            {teaching.verse.text}
-          </Txt>
-          <Txt color={colors.muted}>{teaching.verse.label}</Txt>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+          <View style={{ flex: 1, gap: 6 }}>
+            <Txt size={34} weight={700} serif>Good morning</Txt>
+            <Txt color={colors.muted}>{streakMessage(streak)}</Txt>
+          </View>
+          <ProgressRing done={Number(checks.verse) + Number(checks.teaching) + Number(checks.prayer)} total={3} />
+        </View>
+        <View style={{ borderRadius: 28, overflow: 'hidden', position: 'relative' }}>
+          <Photo source={NATURE.sunrise} alt="Sunrise behind the daily verse" height={260} radius={28} />
+          <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: 18, gap: 8, backgroundColor: 'rgba(18,22,20,0.5)' }}>
+            <Txt weight={700} color="#F4F1EA">Daily verse</Txt>
+            <Txt serif size={22} color="#F4F1EA">{teaching.verse.text}</Txt>
+            <Txt color="#E7E1D6">{teaching.verse.label}</Txt>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
             <Pressable accessibilityRole="button" accessibilityLabel="Like this verse" onPress={() => { markToday(day, 'verse'); setLikedVerse(liked === teaching.verse.osisRef ? null : teaching.verse.osisRef) }} style={{ minHeight: 44, justifyContent: 'center', paddingHorizontal: 8 }}>
-              <Txt weight={700} color={colors.accent}>{liked === teaching.verse.osisRef ? 'Liked' : 'Like'}</Txt>
+              <Txt weight={700} color="#F4F1EA">{liked === teaching.verse.osisRef ? 'Liked' : 'Like'}</Txt>
             </Pressable>
             <Pressable accessibilityRole="button" accessibilityLabel="Share verse as an image" onPress={() => void share()} style={{ minHeight: 44, justifyContent: 'center', paddingHorizontal: 8 }}>
-              <Txt weight={700} color={colors.accent}>Share image</Txt>
+              <Txt weight={700} color="#F4F1EA">Share image</Txt>
             </Pressable>
           </View>
-          {shareNote ? <Txt color={colors.muted}>{shareNote}</Txt> : null}
-        </Card>
+          </View>
+        </View>
+        {shareNote ? <Txt color={colors.muted}>{shareNote}</Txt> : null}
         <Card>
           <Txt weight={700}>Day {teaching.dayOfWeek} of 7 · {teaching.topic}</Txt>
           <Txt>{teaching.reflection}</Txt>
@@ -126,9 +131,18 @@ export default function TodayScreen() {
             <Txt weight={700} color={colors.accent}>{reminder ? 'Reminder on' : 'Remind me this evening'}</Txt>
           </Pressable>
         </Card>
-        <Link href="/bedtime" asChild>
-          <Button label="Wind down" testID="home-bedtime" />
-        </Link>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+          <Link href="/stories/creation" asChild>
+            <Pressable accessibilityRole="link" style={{ flexGrow: 1, flexBasis: 220, minWidth: 0, minHeight: 140 }}>
+              <Photo source={NATURE.leaves} alt="Leaves for the creation story" height={140} />
+            </Pressable>
+          </Link>
+          <Link href="/bedtime" asChild>
+            <Pressable accessibilityRole="link" testID="home-bedtime" style={{ flexGrow: 1, flexBasis: 220, minWidth: 0, minHeight: 140 }}>
+              <Photo source={NATURE.water} alt="Still water for sleep" height={140} />
+            </Pressable>
+          </Link>
+        </View>
       </Column>
     </Screen>
   )

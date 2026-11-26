@@ -42,6 +42,10 @@ export default function Paywall() {
             </Txt>
             <Txt color={colors.goldText}>{plan.price}</Txt>
             <Txt color={colors.muted}>{plan.detail}</Txt>
+            {plan.points.map((point) => (
+              <Txt key={point}>{point}</Txt>
+            ))}
+            {plan.best ? <Txt weight={700} color={colors.accent}>Best value</Txt> : null}
             {plan.comingSoon ? (
               <Button
                 label="Coming soon"

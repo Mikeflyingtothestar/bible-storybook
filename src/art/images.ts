@@ -13,3 +13,9 @@ export const ART_SOURCES: Record<string, ImageSourcePropType> = {
 
 /** Original illustration for the landing hero. Not part of the Commons gallery. */
 export const HERO_BASILICA = require('../../assets/art/davinci-basilica.webp') as ImageSourcePropType
+
+export const NATURE = {
+  sunrise: require('../../assets/art/sunrise-sky.webp') as ImageSourcePropType,
+  water: require('../../assets/art/still-water.webp') as ImageSourcePropType,
+  leaves: require('../../assets/art/soft-leaves.webp') as ImageSourcePropType,
+}

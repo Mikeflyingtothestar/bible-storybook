@@ -59,6 +59,9 @@ function ProgrammeCard({
       </Txt>
       <Txt color={colors.muted}>{programme.summary}</Txt>
       <Txt weight={700}>{lessonProgress(finished, programme.lessons.length)}% complete</Txt>
+      <View style={{ height: 8, borderRadius: 99, backgroundColor: colors.bg, overflow: 'hidden' }}>
+        <View style={{ height: 8, width: `${lessonProgress(finished, programme.lessons.length)}%`, backgroundColor: colors.accent }} />
+      </View>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
         {programme.lessons.map((item, index) => (
           <Pressable key={item.id} accessibilityRole="button" accessibilityLabel={item.title} onPress={() => setOpen(item.id)} style={{ minHeight: 44, paddingHorizontal: 10, borderRadius: 999, justifyContent: 'center', backgroundColor: open === item.id ? colors.accent : colors.bg }}>

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Pressable, TextInput } from 'react-native'
 
 import { useAuth } from '@/src/auth/AuthProvider'
+import { usePrefs } from '@/src/preferences/store'
 import { AppBar, Button, Card, Column, Screen, Txt, fontSans } from '@/src/components/ui'
 import { saveGratitude, saveJournal } from '@/src/data/wellness'
 import { gratitudeStreak, streakMessage } from '@/src/journal/streak'
@@ -26,6 +27,7 @@ export default function JournalScreen() {
   const [showExamen, setShowExamen] = useState(false)
   const [dates, setDates] = useState<string[]>([])
   const [note, setNote] = useState<string | null>(null)
+  const mood = usePrefs((state) => state.mood)
   const day = dayKey(new Date())
   const prompt = PROMPTS[Number(day.slice(-2)) % PROMPTS.length] ?? PROMPTS[0]
 
@@ -50,6 +52,7 @@ export default function JournalScreen() {
           A private page
         </Txt>
         <Txt color={colors.muted}>{streakMessage(gratitudeStreak(dates, day))}</Txt>
+        {mood ? <Txt weight={700}>Mood · {mood}</Txt> : null}
         <Card>
           <Txt weight={700}>{prompt}</Txt>
           <TextInput accessibilityLabel="Gratitude" value={gratitude} onChangeText={setGratitude} multiline placeholder="A few words is enough" placeholderTextColor={colors.muted} style={{ minHeight: 96, borderWidth: 1, borderColor: colors.border, borderRadius: 14, padding: 12, color: colors.text, fontFamily: fontSans(), textAlignVertical: 'top' }} />

@@ -1,6 +1,8 @@
 import { Link } from 'expo-router'
 import { Pressable, Text, View } from 'react-native'
 
+import { NATURE } from '@/src/art/images'
+import { Photo } from '@/src/components/Photo'
 import { fontSans, fontSerif } from '@/src/components/ui'
 import { bedtime } from '@/src/theme/tokens'
 
@@ -14,7 +16,8 @@ const READINGS = [
 export default function BedtimeHome() {
   return (
     <View style={{ flex: 1, backgroundColor: bedtime.bg, padding: 24, gap: 16 }}>
-      <Text style={{ color: bedtime.text, fontFamily: fontSerif(700), fontSize: 36 }}>Bedtime</Text>
+      <Photo source={NATURE.water} alt="Still water for the night wind-down" height={180} />
+      <Text style={{ color: bedtime.text, fontFamily: fontSerif(700), fontSize: 36 }}>Sleep</Text>
       <Text style={{ color: bedtime.muted, fontFamily: fontSans(), fontSize: 16, lineHeight: 24 }}>
         One free wind-down each night. Psalm 23 is the short narrated sleep story. Set 2, 5, 10 or 15 minutes, then let it fade.
       </Text>
