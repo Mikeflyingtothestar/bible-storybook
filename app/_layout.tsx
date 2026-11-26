@@ -5,6 +5,7 @@ import { useFonts } from 'expo-font'
 import { Stack } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { useEffect } from 'react'
+import { Platform } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 import { AuthProvider } from '@/src/auth/AuthProvider'
@@ -27,7 +28,7 @@ export default function RootLayout() {
 
   useEffect(() => {
     void SplashScreen.hideAsync().catch(() => undefined)
-    if (typeof window === 'undefined' || !('serviceWorker' in navigator) || navigator.webdriver) return
+    if (Platform.OS !== 'web' || typeof navigator === 'undefined' || !('serviceWorker' in navigator) || navigator.webdriver) return
     void navigator.serviceWorker.register('/bible-storybook/sw.js').catch(() => undefined)
   }, [])
 

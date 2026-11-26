@@ -35,6 +35,9 @@ type Preferences = {
   openedDays: string[]
   likedVerse: string | null
   eveningReminder: boolean
+  morningReminder: boolean
+  morningFired: string
+  eveningFired: string
   preferredTime: 'morning' | 'evening' | 'flexible'
   morningTime: string
   eveningTime: string
@@ -54,6 +57,8 @@ type Preferences = {
   markOpened: (day: string) => void
   setLikedVerse: (likedVerse: string | null) => void
   setEveningReminder: (eveningReminder: boolean) => void
+  setMorningReminder: (morningReminder: boolean) => void
+  markReminderFired: (slot: 'morning' | 'evening', day: string) => void
   setPreferredTime: (preferredTime: 'morning' | 'evening' | 'flexible') => void
   setMorningTime: (morningTime: string) => void
   setEveningTime: (eveningTime: string) => void
@@ -103,6 +108,9 @@ export const usePrefs = create<Preferences>()(
       openedDays: [],
       likedVerse: null,
       eveningReminder: false,
+      morningReminder: false,
+      morningFired: '',
+      eveningFired: '',
       preferredTime: 'flexible',
       morningTime: '07:30',
       eveningTime: '21:00',
@@ -131,6 +139,8 @@ export const usePrefs = create<Preferences>()(
       markOpened: (day) => set((state) => ({ openedDays: state.openedDays.includes(day) ? state.openedDays : [...state.openedDays, day].slice(-400) })),
       setLikedVerse: (likedVerse) => set({ likedVerse }),
       setEveningReminder: (eveningReminder) => set({ eveningReminder }),
+      setMorningReminder: (morningReminder) => set({ morningReminder }),
+      markReminderFired: (slot, day) => set(slot === 'morning' ? { morningFired: day } : { eveningFired: day }),
       setPreferredTime: (preferredTime) => set({ preferredTime }),
       setMorningTime: (morningTime) => set({ morningTime }),
       setEveningTime: (eveningTime) => set({ eveningTime }),
@@ -157,6 +167,9 @@ export const usePrefs = create<Preferences>()(
         openedDays: state.openedDays,
         likedVerse: state.likedVerse,
         eveningReminder: state.eveningReminder,
+        morningReminder: state.morningReminder,
+        morningFired: state.morningFired,
+        eveningFired: state.eveningFired,
         preferredTime: state.preferredTime,
         morningTime: state.morningTime,
         eveningTime: state.eveningTime,

@@ -1,3 +1,5 @@
+import { Platform } from 'react-native'
+
 export const AMBIENT_BEDS = [
   { id: 'rain', title: 'Rain' },
   { id: 'water', title: 'Water' },
@@ -14,7 +16,7 @@ export type AmbientBed = { stop: () => void }
  * sample library. A user gesture should call this so the audio context can start.
  */
 export function startAmbience(id: AmbientId): AmbientBed | null {
-  if (typeof window === 'undefined' || typeof window.AudioContext === 'undefined') return null
+  if (Platform.OS !== 'web' || typeof window === 'undefined' || typeof window.AudioContext !== 'function') return null
   const ctx = new window.AudioContext()
   void ctx.resume()
   const master = ctx.createGain()

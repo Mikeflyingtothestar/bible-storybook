@@ -1,10 +1,14 @@
 import { useState } from 'react'
-import { Pressable, TextInput, View } from 'react-native'
+import { Platform, Pressable, TextInput, View } from 'react-native'
 
+import { useAuth } from '@/src/auth/AuthProvider'
 import { AppBar, Card, Column, Screen, Txt, fontSans } from '@/src/components/ui'
+import { savePrayerReminder } from '@/src/data/wellness'
 import { usePrefs } from '@/src/preferences/store'
 import { PRAYERS } from '@/src/prayer/catalog'
-import { parseRemindTime } from '@/src/prayer/reminders'
+import { InAppReminder } from '@/src/prayer/InAppReminder'
+import { syncPrayerReminder } from '@/src/prayer/notify'
+import { IN_APP_REMINDER_COPY, parseRemindTime, reminderChannel } from '@/src/prayer/reminders'
 import { useAppTheme } from '@/src/theme/ThemeProvider'
 import { speakText, stopSpeaking } from '@/src/voice/speak'
 
@@ -12,11 +16,16 @@ const LENGTHS = [2, 5, 10] as const
 
 export default function PrayScreen() {
   const { colors } = useAppTheme()
+  const { user } = useAuth()
   const morningTime = usePrefs((state) => state.morningTime)
   const eveningTime = usePrefs((state) => state.eveningTime)
+  const morningOn = usePrefs((state) => state.morningReminder)
+  const eveningOn = usePrefs((state) => state.eveningReminder)
   const minutes = usePrefs((state) => state.prayerMinutes)
   const setMorningTime = usePrefs((state) => state.setMorningTime)
   const setEveningTime = usePrefs((state) => state.setEveningTime)
+  const setMorningOn = usePrefs((state) => state.setMorningReminder)
+  const setEveningOn = usePrefs((state) => state.setEveningReminder)
   const setMinutes = usePrefs((state) => state.setPrayerMinutes)
   const markToday = usePrefs((state) => state.markToday)
   const morning = PRAYERS.find((prayer) => prayer.id === 'morning-light')
@@ -31,7 +40,30 @@ export default function PrayScreen() {
     }
     if (kind === 'morning') setMorningTime(parsed)
     else setEveningTime(parsed)
-    setNote('Time saved on this device.')
+    const enabled = kind === 'morning' ? morningOn : eveningOn
+    if (enabled) {
+      void syncPrayerReminder(kind, true, parsed).then(async (result) => {
+        setNote(result.message)
+        if (result.ok && user) await savePrayerReminder(user.id, kind, true, parsed)
+      })
+      return
+    }
+    setNote(reminderChannel(Platform.OS) === 'in-app' ? 'Time saved on this device. ' + IN_APP_REMINDER_COPY : 'Time saved on this phone.')
+  }
+
+  function toggle(kind: 'morning' | 'evening') {
+    const next = kind === 'morning' ? !morningOn : !eveningOn
+    const time = kind === 'morning' ? morningTime : eveningTime
+    if (kind === 'morning') setMorningOn(next)
+    else setEveningOn(next)
+    void syncPrayerReminder(kind, next, time).then(async (result) => {
+      if (!result.ok) {
+        if (kind === 'morning') setMorningOn(false)
+        else setEveningOn(false)
+      }
+      setNote(result.message)
+      if (result.ok && user) await savePrayerReminder(user.id, kind, next, time)
+    })
   }
 
   function listen(title: string, body: string, verse: string) {
@@ -47,7 +79,11 @@ export default function PrayScreen() {
         <Txt size={34} weight={700} serif>
           Morning and night
         </Txt>
-        <Txt color={colors.muted}>Set your own times. Pick 2, 5 or 10 minutes. Nothing is billed weekly.</Txt>
+        <Txt color={colors.muted}>Set your own times. Pick 2, 5 or 10 minutes. Nothing is billed weekly. {reminderChannel(Platform.OS) === 'in-app' ? IN_APP_REMINDER_COPY : 'A reminder asks this phone for permission only when you turn it on.'}</Txt>
+        <InAppReminder slot="morning" enabled={morningOn} time={morningTime} />
+        <InAppReminder slot="evening" enabled={eveningOn} time={eveningTime} />
+        <ReminderSwitch label="Morning reminder" on={morningOn} onPress={() => toggle('morning')} />
+        <ReminderSwitch label="Evening reminder" on={eveningOn} onPress={() => toggle('evening')} />
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
           {LENGTHS.map((length) => (
             <Pressable key={length} accessibilityRole="button" accessibilityLabel={`${length} minutes`} onPress={() => setMinutes(length)} style={{ minHeight: 44, paddingHorizontal: 16, borderRadius: 999, justifyContent: 'center', backgroundColor: minutes === length ? colors.accent : colors.surface }}>
@@ -63,6 +99,15 @@ export default function PrayScreen() {
         {note ? <Txt>{note}</Txt> : null}
       </Column>
     </Screen>
+  )
+}
+
+function ReminderSwitch({ label, on, onPress }: { label: string; on: boolean; onPress: () => void }) {
+  const { colors } = useAppTheme()
+  return (
+    <Pressable accessibilityRole="switch" accessibilityState={{ checked: on }} accessibilityLabel={label} onPress={onPress} style={{ minHeight: 48, borderRadius: 14, paddingHorizontal: 16, justifyContent: 'center', backgroundColor: on ? colors.accent : colors.surface }}>
+      <Txt weight={700} color={on ? colors.onAccent : colors.text}>{on ? `${label} on` : label}</Txt>
+    </Pressable>
   )
 }
 

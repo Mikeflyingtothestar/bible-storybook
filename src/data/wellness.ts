@@ -36,6 +36,15 @@ export async function listGratitudeDates(userId: string): Promise<string[]> {
   return (data as { local_date: string }[]).map((row) => row.local_date)
 }
 
+export async function savePrayerReminder(userId: string, slot: 'morning' | 'evening', enabled: boolean, time: string): Promise<DataError | null> {
+  if (!/^\d{2}:\d{2}$/.test(time)) return { code: 'validation', message: 'Use a time like 07:30.' }
+  const { error } = await supabase.from('prayer_reminders').upsert(
+    { user_id: userId, slot, enabled, remind_time: `${time}:00` },
+    { onConflict: 'user_id,slot' },
+  )
+  return error ? fail(error) : null
+}
+
 export async function saveTopics(userId: string, topics: string[]): Promise<DataError | null> {
   const clean = topics.filter(isTopic)
   const { error: removeError } = await supabase.from('user_topics').delete().eq('user_id', userId)
