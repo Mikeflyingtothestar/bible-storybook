@@ -31,6 +31,7 @@ export default function BedtimePlayer() {
   const provider = useMemo(() => new DeviceVoiceProvider(), [])
   const [minutes, setMinutes] = useState(() => nightMinutes(minutesParam))
   const [bedId, setBedId] = useState<AmbientId | null>(null)
+  const [soundNote, setSoundNote] = useState<string | null>(null)
   const bedRef = useRef<AmbientBed | null>(null)
   const [playing, setPlaying] = useState(false)
   const [active, setActive] = useState<number | null>(null)
@@ -95,7 +96,15 @@ export default function BedtimePlayer() {
       setBedId(null)
       return
     }
-    bedRef.current = startAmbience(id)
+    const started = startAmbience(id)
+    if (!started) {
+      bedRef.current = null
+      setBedId(null)
+      setSoundNote('These beds play in the browser. On a phone, Begin reads the passage with the device voice.')
+      return
+    }
+    setSoundNote(null)
+    bedRef.current = started
     setBedId(id)
   }
 
@@ -111,6 +120,7 @@ export default function BedtimePlayer() {
           {playing ? formatClock(remaining) : `${minutes} minutes`}
         </Text>
         <Text style={{ color: bedtime.muted, fontFamily: fontSans(700) }}>Sounds</Text>
+        {soundNote ? <Text style={{ color: bedtime.muted, fontFamily: fontSans() }}>{soundNote}</Text> : null}
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
           {AMBIENT_BEDS.map((bed) => (
             <Pressable key={bed.id} accessibilityRole="button" accessibilityLabel={`${bed.title} sound`} onPress={() => chooseBed(bed.id)} style={{ minHeight: 44, paddingHorizontal: 12, borderRadius: 999, justifyContent: 'center', backgroundColor: bedId === bed.id ? '#3A2E1C' : bedtime.surface }}>

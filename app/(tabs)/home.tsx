@@ -1,9 +1,14 @@
 import Feather from '@expo/vector-icons/Feather'
 import { Link } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { Pressable, useWindowDimensions, View } from 'react-native'
+import { Platform, Pressable, useWindowDimensions, View } from 'react-native'
 
+import { useAuth } from '@/src/auth/AuthProvider'
 import { NATURE } from '@/src/art/images'
+import { savePrayerReminder } from '@/src/data/wellness'
+import { InAppReminder } from '@/src/prayer/InAppReminder'
+import { syncPrayerReminder } from '@/src/prayer/notify'
+import { IN_APP_REMINDER_COPY, reminderChannel } from '@/src/prayer/reminders'
 import { AppBar, Button, Card, Column, Screen, Txt } from '@/src/components/ui'
 import { Photo } from '@/src/components/Photo'
 import { ProgressRing } from '@/src/components/ProgressRing'
@@ -19,6 +24,8 @@ import { topicsForIntentions } from '@/src/wellness/goals'
 
 export default function TodayScreen() {
   const { colors } = useAppTheme()
+  const { user } = useAuth()
+  const [reminderNote, setReminderNote] = useState<string | null>(null)
   const intentions = usePrefs((state) => state.intentions)
   const today = usePrefs((state) => state.today)
   const openedDays = usePrefs((state) => state.openedDays)
@@ -147,12 +154,27 @@ export default function TodayScreen() {
           </View>
           <Txt color={colors.muted}>{support.text} {support.verse.label}</Txt>
         </Card>
+        <InAppReminder slot="evening" enabled={reminder} time={eveningTime} />
         <Card>
           <Txt weight={700}>One evening reminder</Txt>
-          <Txt color={colors.muted}>Optional, around {eveningTime}. Turning it off changes nothing about your streak.</Txt>
-          <Pressable accessibilityRole="switch" accessibilityState={{ checked: reminder }} onPress={() => setReminder(!reminder)} style={{ minHeight: 44, justifyContent: 'center' }}>
+          <Txt color={colors.muted}>Optional, around {eveningTime}. Turning it off changes nothing about your streak. {reminderChannel(Platform.OS) === 'in-app' ? IN_APP_REMINDER_COPY : 'Turning this on asks this phone for permission.'}</Txt>
+          <Pressable
+            accessibilityRole="switch"
+            accessibilityState={{ checked: reminder }}
+            onPress={() => {
+              const next = !reminder
+              setReminder(next)
+              void syncPrayerReminder('evening', next, eveningTime).then(async (result) => {
+                if (!result.ok) setReminder(false)
+                setReminderNote(result.message)
+                if (result.ok && user) await savePrayerReminder(user.id, 'evening', next, eveningTime)
+              })
+            }}
+            style={{ minHeight: 44, justifyContent: 'center' }}
+          >
             <Txt weight={700} color={colors.accent}>{reminder ? 'Reminder on' : 'Remind me this evening'}</Txt>
           </Pressable>
+          {reminderNote ? <Txt color={colors.muted}>{reminderNote}</Txt> : null}
         </Card>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
           <Link href="/stories/creation" asChild>

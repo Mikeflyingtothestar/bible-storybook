@@ -29,6 +29,20 @@ export function minutesOfDay(hhmm: string): number | null {
  * A reminder is due when the clock has reached its time today and it has not
  * already fired for this local date. The caller stores the last fired date.
  */
+export function localDayKey(date: Date): string {
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${date.getFullYear()}-${month}-${day}`
+}
+
+/** Lock-screen alerts exist only on the phone apps. The website keeps the reminder inside the screen. */
+export function reminderChannel(platform: string): 'device' | 'in-app' {
+  return platform === 'ios' || platform === 'android' ? 'device' : 'in-app'
+}
+
+export const IN_APP_REMINDER_COPY =
+  'On this website the reminder stays in the app. A lock-screen notification is only on the iPhone and Android apps.'
+
 export function reminderDue(time: string, nowMinutes: number, lastFiredDate: string | null, today: string): boolean {
   const target = minutesOfDay(time)
   if (target === null) return false
