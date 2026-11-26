@@ -1,24 +1,16 @@
 import { searchSample } from '../bible/sample'
+import { guideFor, TOPIC_GUIDES } from './library'
 import { requireVerse, verseByRef, type CitedVerse } from '../wellness/bundled'
 import { isTopic, type TopicId } from '../wellness/topics'
 
-export const COMPANION_DISCLAIMER = 'This is not pastoral or medical advice. It only repeats verses from the bundled public-domain Bible.'
+export const COMPANION_DISCLAIMER = 'This is not a therapist, a pastor, or medical advice. It only repeats verses from the bundled public-domain Bible.'
 
 export const CRISIS_RESOURCES = {
   befriendersMalaysia: 'https://www.befrienders.org.my/',
   findAHelpline: 'https://findahelpline.com',
 } as const
 
-const TOPIC_REFS: Record<TopicId, string[]> = {
-  anxiety: ['MAT.6.25', 'MAT.6.34', 'PSA.23.4'],
-  forgiveness: ['MAT.6.12', 'MAT.6.14'],
-  grief: ['PSA.23.4', 'JHN.1.5'],
-  purpose: ['GEN.1.27', 'JHN.1.4', 'MAT.6.33'],
-  gratitude: ['PSA.23.6', 'GEN.1.31'],
-  rest: ['PSA.23.2', 'PSA.23.3'],
-  courage: ['PSA.23.4', 'PSA.121.2'],
-  peace: ['PSA.23.2', 'PSA.121.7', 'PSA.121.8'],
-}
+const TOPIC_REFS: Record<TopicId, string[]> = Object.fromEntries(TOPIC_GUIDES.map((guide) => [guide.id, guide.refs])) as Record<TopicId, string[]>
 
 const TOPIC_WORDS: Record<TopicId, string[]> = {
   anxiety: ['anxious', 'anxiety', 'worry', 'worried', 'afraid'],
@@ -29,6 +21,8 @@ const TOPIC_WORDS: Record<TopicId, string[]> = {
   rest: ['rest', 'sleep', 'weary', 'tired', 'still water'],
   courage: ['courage', 'fear', 'afraid', 'evil'],
   peace: ['peace', 'calm', 'help', 'keeper', 'safe'],
+  loneliness: ['lonely', 'loneliness', 'alone', 'nobody', 'isolated'],
+  anger: ['anger', 'angry', 'furious', 'rage', 'resent'],
 }
 
 const DISTRESS = [
@@ -78,7 +72,7 @@ export function citationsFor(question: string): CitedVerse[] {
   const fromSearch = searchSample(question)
     .map((hit) => verseByRef(hit.osisRef))
     .filter((verse): verse is CitedVerse => verse !== null)
-  return unique([...fromTopics, ...fromSearch]).slice(0, 3)
+  return unique([...fromTopics, ...fromSearch]).slice(0, 4)
 }
 
 export function answerQuestion(question: string): CompanionResult {
@@ -89,11 +83,15 @@ export function answerQuestion(question: string): CompanionResult {
   }
   const crisis = distressDetected(trimmed)
   const citations = citationsFor(crisis ? `${trimmed} grief anxiety` : trimmed)
-  const quoted = (citations.length > 0 ? citations : [requireVerse('PSA.23.1')]).slice(0, 3)
+  const quoted = (citations.length > 0 ? citations : [requireVerse('PSA.23.1')]).slice(0, 4)
   const lines = quoted.map((verse) => `${verse.label}: “${verse.text}”`)
+  const topic = topicsIn(trimmed)[0]
+  const guide = topic ? guideFor(topic) : null
   const lead = crisis
-    ? 'If you might act on thoughts of harm, contact local emergency services now. Befrienders Malaysia and findahelpline.com can help you find someone to talk with. The bundled text says:'
-    : 'Here is what the bundled World English Bible says, and nothing beyond it.'
+    ? 'This is not a therapist. If you might harm yourself, contact local emergency services now. findahelpline.com lists lines by country, and Befrienders Malaysia is one place to start. The bundled text says:'
+    : guide
+      ? `${guide.reflection} A short prayer: ${guide.prayer} The bundled World English Bible says:`
+      : 'Here is what the bundled World English Bible says, and nothing beyond it.'
   return {
     kind: 'answer',
     text: `${lead} ${lines.join(' ')}`,

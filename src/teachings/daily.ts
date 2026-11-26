@@ -18,6 +18,8 @@ const REFLECTIONS: Record<TopicId, string> = {
   rest: 'Picture a green field and water that is not rushing. Your soul is allowed to be restored without a performance.',
   courage: 'Courage here is not the absence of a dark place. It is company while you walk through it, one step at a time.',
   peace: 'The help in this psalm is steady, like the one who made heaven and earth. You can set the worry down for a minute.',
+  loneliness: 'The keeper in this psalm does not go off duty. You can be in a quiet room and still not be the only one keeping watch.',
+  anger: 'The prayer puts forgiveness in reach without pretending the hurt was small. You can tell the truth and still ask for a looser grip.',
 }
 
 export function dayKey(date: Date): string {

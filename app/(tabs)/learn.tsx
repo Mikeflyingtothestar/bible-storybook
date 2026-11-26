@@ -25,10 +25,10 @@ export default function LearnScreen() {
             key={programme.id}
             programme={programme}
             done={done}
-            onAnswer={async (lessonId, correct) => {
+            onAnswer={async (lessonId, score) => {
               setDone((current) => ({ ...current, [`${programme.id}:${lessonId}`]: true }))
-              setNote(correct ? 'That’s the line in the text.' : 'Look again at the verse, then try the next one.')
-              if (user) await saveLesson(user.id, programme.id, lessonId, correct)
+              setNote(score === 100 ? 'That’s the line in the text.' : 'Some answers differed from the verse. The lesson is saved either way.')
+              if (user) await saveLesson(user.id, programme.id, lessonId, score)
             }}
           />
         ))}
@@ -45,11 +45,12 @@ function ProgrammeCard({
 }: {
   programme: Programme
   done: Record<string, boolean>
-  onAnswer: (lessonId: string, correct: boolean) => void
+  onAnswer: (lessonId: string, score: number) => void
 }) {
   const { colors } = useAppTheme()
   const finished = programme.lessons.filter((lesson) => done[`${programme.id}:${lesson.id}`]).length
   const [open, setOpen] = useState(programme.lessons[0]?.id ?? '')
+  const [picks, setPicks] = useState<Record<string, number>>({})
   const lesson = programme.lessons.find((item) => item.id === open) ?? programme.lessons[0]
   return (
     <Card>
@@ -80,11 +81,31 @@ function ProgrammeCard({
           <Txt color={colors.muted}>
             {lesson.verse.label}: {lesson.verse.text}
           </Txt>
-          <Txt weight={700}>{lesson.quiz.question}</Txt>
-          {lesson.quiz.choices.map((choice, index) => (
-            <Pressable key={choice} accessibilityRole="button" onPress={() => onAnswer(lesson.id, quizCorrect(lesson.quiz, index))} style={{ minHeight: 44, justifyContent: 'center' }}>
-              <Txt color={colors.accent}>{choice}</Txt>
-            </Pressable>
+          {lesson.quiz.map((quiz, quizIndex) => (
+            <View key={quiz.question} style={{ gap: 4 }}>
+              <Txt weight={700}>{quizIndex + 1}. {quiz.question}</Txt>
+              {quiz.choices.map((choice, index) => {
+                const key = `${programme.id}:${lesson.id}:${quizIndex}`
+                const selected = picks[key] === index
+                return (
+                  <Pressable
+                    key={choice}
+                    accessibilityRole="button"
+                    onPress={() => {
+                      const next = { ...picks, [key]: index }
+                      setPicks(next)
+                      const finished = lesson.quiz.every((_, item) => next[`${programme.id}:${lesson.id}:${item}`] !== undefined)
+                      if (!finished) return
+                      const correct = lesson.quiz.filter((item, itemIndex) => quizCorrect(item, next[`${programme.id}:${lesson.id}:${itemIndex}`] ?? -1)).length
+                      onAnswer(lesson.id, Math.round((correct / lesson.quiz.length) * 100))
+                    }}
+                    style={{ minHeight: 44, justifyContent: 'center' }}
+                  >
+                    <Txt color={selected ? colors.text : colors.accent} weight={selected ? 700 : 400}>{choice}</Txt>
+                  </Pressable>
+                )
+              })}
+            </View>
           ))}
         </View>
       ) : null}

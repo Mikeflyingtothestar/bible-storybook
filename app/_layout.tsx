@@ -27,6 +27,8 @@ export default function RootLayout() {
 
   useEffect(() => {
     void SplashScreen.hideAsync().catch(() => undefined)
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator) || navigator.webdriver) return
+    void navigator.serviceWorker.register('/bible-storybook/sw.js').catch(() => undefined)
   }, [])
 
   return (

@@ -1,16 +1,24 @@
 {
   "name": "Bible Storybook",
   "short_name": "Storybook",
-  "start_url": "/bible-storybook/",
+  "description": "A few quiet minutes for calm, sleep, and reflection, with Scripture underneath.",
+  "start_url": "/bible-storybook/home",
   "scope": "/bible-storybook/",
   "display": "standalone",
   "background_color": "#F7F4EE",
   "theme_color": "#F7F4EE",
   "icons": [
     {
-      "src": "/bible-storybook/favicon.ico",
-      "sizes": "48x48",
-      "type": "image/x-icon"
+      "src": "/bible-storybook/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/bible-storybook/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }

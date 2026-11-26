@@ -8,7 +8,7 @@ export type Lesson = {
   minutes: number
   body: string
   verse: CitedVerse
-  quiz: Quiz
+  quiz: Quiz[]
 }
 
 export type Programme = {
@@ -19,31 +19,75 @@ export type Programme = {
   lessons: Lesson[]
 }
 
-function lesson(id: string, title: string, ref: string, body: string, quiz: Quiz): Lesson {
-  return { id, title, minutes: 3, body, verse: requireVerse(ref), quiz }
+function lesson(id: string, title: string, ref: string, body: string, quiz: Quiz | Quiz[]): Lesson {
+  return { id, title, minutes: 3, body, verse: requireVerse(ref), quiz: Array.isArray(quiz) ? quiz : [quiz] }
 }
 
 export const PROGRAMMES: Programme[] = [
   {
     id: 'anxiety',
     title: 'Anxiety',
-    summary: 'Three short readings when worry is loud.',
+    summary: 'Five short readings when worry is loud.',
     premium: false,
     lessons: [
-      lesson('worry', 'Don’t be anxious', 'MAT.6.25', 'The verse names the worry, then makes it smaller than a life.', { question: 'What does the verse say not to be anxious for?', choices: ['Your life', 'A festival', 'A journey'], answer: 0 }),
-      lesson('birds', 'The birds', 'MAT.6.26', 'Care is pictured as already happening, not as something you earn.', { question: 'Who feeds the birds?', choices: ['Your Father', 'The market', 'No one'], answer: 0 }),
-      lesson('tomorrow', 'Tomorrow', 'MAT.6.34', 'Tomorrow can wait until tomorrow.', { question: 'What is sufficient?', choices: ['Each day’s own trouble', 'A perfect plan', 'More hours'], answer: 0 }),
+      lesson('worry', 'Don’t be anxious', 'MAT.6.25', 'The verse names the worry, then makes it smaller than a life.', [
+        { question: 'What does the verse say not to be anxious for?', choices: ['Your life', 'A festival', 'A journey'], answer: 0 },
+        { question: 'What clothing question does it set aside?', choices: ['What you will wear', 'Which colour is holy', 'Who made the cloth'], answer: 0 },
+        { question: 'Is the worry treated as the whole of life?', choices: ['No', 'Yes', 'Only on feast days'], answer: 0 },
+      ]),
+      lesson('birds', 'The birds', 'MAT.6.26', 'Care is pictured as already happening, not as something you earn.', [
+        { question: 'Who feeds the birds?', choices: ['Your heavenly Father', 'The market', 'No one'], answer: 0 },
+        { question: 'What do the birds not do?', choices: ['Sow or reap', 'Fly', 'Sing'], answer: 0 },
+        { question: 'How are people compared with the birds?', choices: ['Of more value', 'Of less value', 'The same species'], answer: 0 },
+      ]),
+      lesson('lilies', 'The lilies', 'MAT.6.28', 'Clothing is the example, and the flowers do not toil for it.', [
+        { question: 'What does the verse say to consider?', choices: ['The lilies of the field', 'The market stalls', 'A wardrobe'], answer: 0 },
+        { question: 'What do the lilies not do?', choices: ['Toil or spin', 'Grow', 'Stand in a field'], answer: 0 },
+        { question: 'What is the worry about?', choices: ['Clothing', 'A census', 'A storm'], answer: 0 },
+      ]),
+      lesson('kingdom', 'Seek first', 'MAT.6.33', 'The ask is for God’s Kingdom first, and the rest is added rather than chased.', [
+        { question: 'What should be sought first?', choices: ['God’s Kingdom and his righteousness', 'A larger barn', 'Tomorrow’s menu'], answer: 0 },
+        { question: 'What is given as well?', choices: ['All these things', 'A new name', 'A crown'], answer: 0 },
+        { question: 'Is the verse a demand to earn the gift?', choices: ['No, it says they will be given', 'Yes, by toiling', 'Only if you fast'], answer: 0 },
+      ]),
+      lesson('tomorrow', 'Tomorrow', 'MAT.6.34', 'Tomorrow can wait until tomorrow.', [
+        { question: 'What is sufficient?', choices: ['Each day’s own evil', 'A perfect plan', 'More hours'], answer: 0 },
+        { question: 'Who will be anxious for tomorrow?', choices: ['Tomorrow itself', 'The birds', 'The lilies'], answer: 0 },
+        { question: 'What does the verse say not to be anxious for?', choices: ['Tomorrow', 'Today’s bread', 'The evening'], answer: 0 },
+      ]),
     ],
   },
   {
     id: 'sleep',
     title: 'Sleep',
-    summary: 'Three quiet lines for the end of a day.',
-    premium: true,
+    summary: 'Five quiet lines for the end of a day.',
+    premium: false,
     lessons: [
-      lesson('waters', 'Still waters', 'PSA.23.2', 'Rest is a place you are led, not a test you pass.', { question: 'Where is the speaker led?', choices: ['Beside still waters', 'Into a city', 'Up a wall'], answer: 0 }),
-      lesson('keeper', 'A keeper who stays awake', 'PSA.121.4', 'Someone else can keep watch.', { question: 'Who does not slumber?', choices: ['The keeper of Israel', 'The singer', 'The hills'], answer: 0 }),
-      lesson('coming', 'Coming in', 'PSA.121.8', 'The day can close. Going out and coming in are both kept.', { question: 'What is kept?', choices: ['Going out and coming in', 'Only the morning', 'Only work'], answer: 0 }),
+      lesson('waters', 'Still waters', 'PSA.23.2', 'Rest is a place you are led, not a test you pass.', [
+        { question: 'Where is the speaker led?', choices: ['Beside still waters', 'Into a city', 'Up a wall'], answer: 0 },
+        { question: 'Where do they lie down?', choices: ['In green pastures', 'On a roof', 'In the market'], answer: 0 },
+        { question: 'Who does the leading?', choices: ['The shepherd, the LORD', 'The singer alone', 'The hills'], answer: 0 },
+      ]),
+      lesson('valley', 'The valley', 'PSA.23.4', 'The dark place is named, and so is company.', [
+        { question: 'What will the speaker not fear?', choices: ['Evil', 'Sleep', 'Rain'], answer: 0 },
+        { question: 'Why is the fear set down?', choices: ['Because you are with me', 'Because the valley is gone', 'Because it is noon'], answer: 0 },
+        { question: 'What comforts?', choices: ['Rod and staff', 'A locked gate', 'Silence only'], answer: 0 },
+      ]),
+      lesson('keeper', 'A keeper who stays awake', 'PSA.121.4', 'Someone else can keep watch.', [
+        { question: 'Who does not slumber?', choices: ['He who keeps Israel', 'The singer', 'The hills'], answer: 0 },
+        { question: 'What else will he not do?', choices: ['Sleep', 'Listen', 'Create'], answer: 0 },
+        { question: 'Is the watch handed to you alone?', choices: ['No', 'Yes', 'Only on feast days'], answer: 0 },
+      ]),
+      lesson('shade', 'Shade', 'PSA.121.5', 'The keeper is also shade, close at hand.', [
+        { question: 'Who is your keeper?', choices: ['The LORD', 'The sun', 'The moon'], answer: 0 },
+        { question: 'Where is the shade?', choices: ['On your right hand', 'Over the city wall', 'Behind the hills'], answer: 0 },
+        { question: 'What role does the verse give the LORD?', choices: ['Keeper and shade', 'A distant star', 'A hired watchman'], answer: 0 },
+      ]),
+      lesson('coming', 'Coming in', 'PSA.121.8', 'The day can close. Going out and coming in are both kept.', [
+        { question: 'What is kept?', choices: ['Going out and coming in', 'Only the morning', 'Only work'], answer: 0 },
+        { question: 'How long does the keeping last?', choices: ['From this time forward, and forever more', 'Until noon', 'For one night'], answer: 0 },
+        { question: 'Does the blessing cover coming home?', choices: ['Yes', 'No', 'Only leaving'], answer: 0 },
+      ]),
     ],
   },
   {

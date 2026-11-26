@@ -1,5 +1,14 @@
 export const SLEEP_TIMER_CHOICES = [2, 5, 10, 15, 30, 45, 60, 90, 120] as const
 
+/** The timers offered on the sleep shelf. */
+export const NIGHT_TIMERS = [5, 15, 30, 45] as const
+
+export function nightMinutes(value: string | string[] | undefined, fallback = 15): number {
+  const raw = Array.isArray(value) ? value[0] : value
+  const minutes = Number(raw)
+  return (NIGHT_TIMERS as readonly number[]).includes(minutes) ? minutes : fallback
+}
+
 export function timerRemainingMs(endsAt: number, now: number): number {
   return Math.max(0, endsAt - now)
 }

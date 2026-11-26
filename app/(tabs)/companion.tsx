@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Platform, Pressable, ScrollView, TextInput, View, type ViewStyle } from 'react-native'
 
 import { useAuth } from '@/src/auth/AuthProvider'
-import { answerQuestion, type CompanionResult } from '@/src/companion/answer'
+import { answerQuestion, COMPANION_DISCLAIMER, type CompanionResult } from '@/src/companion/answer'
+import { guideFor, TOPIC_GUIDES } from '@/src/companion/library'
 import { callCompanionLlm } from '@/src/companion/llm'
 import { NATURE } from '@/src/art/images'
 import { AppBar, Card, Screen, Txt, fontSans } from '@/src/components/ui'
@@ -12,6 +13,7 @@ import { usePrefs } from '@/src/preferences/store'
 import { dayKey } from '@/src/teachings/daily'
 import { useAppTheme } from '@/src/theme/ThemeProvider'
 import { requireVerse } from '@/src/wellness/bundled'
+import type { TopicId } from '@/src/wellness/topics'
 
 const PROMPTS = ['I feel anxious', 'Help me rest', 'A verse for grief']
 const BREATH = ['Breathe in', 'Hold', 'Breathe out']
@@ -32,6 +34,18 @@ export default function CompanionScreen() {
   const day = dayKey(new Date())
   const used = companionDay === day ? companionCount : 0
   const remaining = Math.max(0, 5 - used)
+
+  function openTopic(id: TopicId) {
+    const guide = guideFor(id)
+    setAsked(guide.title)
+    setResult({
+      kind: 'answer',
+      text: `${guide.reflection} A short prayer: ${guide.prayer}`,
+      citations: guide.refs.map((ref) => requireVerse(ref)),
+      crisis: null,
+      disclaimer: COMPANION_DISCLAIMER,
+    })
+  }
 
   async function ask(text?: string) {
     const query = (text ?? question).trim()
@@ -72,7 +86,14 @@ export default function CompanionScreen() {
             <View style={{ gap: 12 }}>
               <Photo source={NATURE.leaves} alt="Soft leaves" height={140} />
               <Txt size={28} weight={700} serif>What is on your mind?</Txt>
-              <Txt color={colors.muted}>Ask in ordinary words. You will get a verse, not a lecture.</Txt>
+              <Txt color={colors.muted}>Ask in ordinary words, or open a topic. You will get verses with their references, a short reflection, and a prayer. This is not a therapist.</Txt>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                {TOPIC_GUIDES.map((guide) => (
+                  <Pressable key={guide.id} accessibilityRole="button" accessibilityLabel={guide.title} onPress={() => openTopic(guide.id)} style={{ minHeight: 44, paddingHorizontal: 12, borderRadius: 999, justifyContent: 'center', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}>
+                    <Txt size={14} weight={700}>{guide.title}</Txt>
+                  </Pressable>
+                ))}
+              </View>
             </View>
           ) : null}
           {asked ? (
@@ -87,6 +108,12 @@ export default function CompanionScreen() {
           ) : null}
           {result ? (
             <View style={{ alignSelf: 'flex-start', maxWidth: '92%', gap: 8 }}>
+              {result.kind === 'answer' && result.crisis ? (
+                <View testID="crisis-card" style={{ borderRadius: 18, padding: 14, gap: 6, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.danger }}>
+                  <Txt weight={700}>This is not a therapist.</Txt>
+                  <Txt>If you might harm yourself, contact local emergency services. findahelpline.com lists lines by country. Befrienders Malaysia is one place to start.</Txt>
+                </View>
+              ) : null}
               <View style={{ borderRadius: 18, padding: 14, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}>
                 <Txt>{result.text}</Txt>
               </View>
@@ -98,9 +125,7 @@ export default function CompanionScreen() {
                     </Card>
                   ))
                 : null}
-              {result.kind === 'answer' && result.crisis ? (
-                <Txt weight={700}>If you are in danger, contact local emergency services. Befrienders Malaysia and findahelpline.com can help.</Txt>
-              ) : null}
+              <Txt size={12} color={colors.muted}>{result.disclaimer}</Txt>
             </View>
           ) : null}
           <Pressable accessibilityRole="button" accessibilityLabel="Open calm breathing" onPress={() => { setCalmOpen(true); setBreath((value) => (value + 1) % 3) }} style={{ minHeight: 88, borderRadius: 20, padding: 14, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, flexDirection: 'row', alignItems: 'center', gap: 14 }}>
@@ -115,7 +140,7 @@ export default function CompanionScreen() {
         <View style={{ paddingHorizontal: 16, gap: 8, paddingBottom: 8 }}>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
             {PROMPTS.map((prompt) => (
-              <Pressable key={prompt} accessibilityRole="button" onPress={() => void ask(prompt)} style={{ minHeight: 40, paddingHorizontal: 12, borderRadius: 999, justifyContent: 'center', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}>
+              <Pressable key={prompt} accessibilityRole="button" onPress={() => void ask(prompt)} style={{ minHeight: 44, paddingHorizontal: 12, borderRadius: 999, justifyContent: 'center', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}>
                 <Txt size={14}>{prompt}</Txt>
               </Pressable>
             ))}
@@ -127,7 +152,7 @@ export default function CompanionScreen() {
             </Pressable>
           </View>
           <Txt size={12} color={colors.muted} style={{ textAlign: 'center' }}>
-            Answers quote the Bible. Not pastoral or medical advice.{user ? '' : ' Counted on this device until you sign in.'}
+            Answers quote the Bible. Not a therapist, a pastor, or medical advice.{user ? '' : ' Counted on this device until you sign in.'}
           </Txt>
         </View>
       </View>

@@ -1,4 +1,4 @@
-export const TOPICS = ['anxiety', 'forgiveness', 'grief', 'purpose', 'gratitude', 'rest', 'courage', 'peace'] as const
+export const TOPICS = ['anxiety', 'forgiveness', 'grief', 'purpose', 'gratitude', 'rest', 'courage', 'peace', 'loneliness', 'anger'] as const
 
 export type TopicId = (typeof TOPICS)[number]
 

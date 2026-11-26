@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
 import { answerQuestion, distressDetected } from './answer'
+import { TOPIC_GUIDES } from './library'
 import { callCompanionLlm, COMPANION_LLM_ENABLED } from './llm'
 import { gratitudeStreak, weekMarks } from '../journal/streak'
 import { quizCorrect, PROGRAMMES, lessonProgress } from '../learn/programmes'
+import { NIGHT_TIMERS, nightMinutes } from '../bedtime/timer'
+import { verseByRef } from '../wellness/bundled'
 import { dailyTeaching } from '../teachings/daily'
 import { isWaitlistEmail, isWaitlistPlan } from '../pricing/plans'
 import { topicsForIntentions } from '../wellness/goals'
@@ -16,8 +19,21 @@ describe('companion answers', () => {
     if (result.kind !== 'answer') return
     expect(result.citations.length).toBeGreaterThan(0)
     expect(result.text).toContain(result.citations[0]?.label)
-    expect(result.disclaimer.toLowerCase()).toContain('not pastoral')
+    expect(result.disclaimer.toLowerCase()).toContain('not a therapist')
     expect(result.crisis).toBeNull()
+    const anxiety = answerQuestion('I feel lonely')
+    if (anxiety.kind !== 'answer') throw new Error('expected an answer')
+    expect(anxiety.citations.length).toBeGreaterThanOrEqual(3)
+  })
+
+  it('keeps three public-domain verses, a reflection, and a prayer on every topic', () => {
+    expect(TOPIC_GUIDES.map((guide) => guide.id)).toEqual(['anxiety', 'grief', 'forgiveness', 'purpose', 'gratitude', 'rest', 'courage', 'peace', 'loneliness', 'anger'])
+    for (const guide of TOPIC_GUIDES) {
+      expect(guide.refs.length).toBeGreaterThanOrEqual(3)
+      expect(guide.reflection.length).toBeGreaterThan(20)
+      expect(guide.prayer.length).toBeGreaterThan(10)
+      for (const ref of guide.refs) expect(verseByRef(ref), ref).not.toBeNull()
+    }
   })
 
   it('shows crisis resources and still cites a verse', () => {
@@ -25,6 +41,7 @@ describe('companion answers', () => {
     const result = answerQuestion('I want to die')
     if (result.kind !== 'answer') throw new Error('expected an answer')
     expect(result.crisis?.findAHelpline).toContain('findahelpline.com')
+    expect(result.text.toLowerCase()).toContain('not a therapist')
     expect(result.citations.length).toBeGreaterThan(0)
   })
 
@@ -66,8 +83,19 @@ describe('daily pieces', () => {
     const lesson = PROGRAMMES[0]?.lessons[0]
     expect(lesson).toBeTruthy()
     if (!lesson) return
-    expect(quizCorrect(lesson.quiz, lesson.quiz.answer)).toBe(true)
+    const quiz = lesson.quiz[0]
+    expect(quiz).toBeTruthy()
+    if (!quiz) return
+    expect(quizCorrect(quiz, quiz.answer)).toBe(true)
     expect(lessonProgress(3, 7)).toBe(43)
+    for (const id of ['anxiety', 'sleep']) {
+      const programme = PROGRAMMES.find((item) => item.id === id)
+      expect(programme?.lessons).toHaveLength(5)
+      expect(programme?.lessons.every((item) => item.quiz.length >= 3)).toBe(true)
+    }
+    expect(NIGHT_TIMERS).toEqual([5, 15, 30, 45])
+    expect(nightMinutes('30')).toBe(30)
+    expect(nightMinutes('7')).toBe(15)
   })
 
   it('adds crisis lines when a mood note is distressed', () => {
