@@ -19,7 +19,7 @@ test.describe('qa', () => {
     await page.setViewportSize({ width: 1280, height: 900 })
 
     await page.goto('./')
-    await expect(page.getByText('The Bible, told like a story')).toBeVisible()
+    await expect(page.getByText('Calm, sleep, and a moment to reflect')).toBeVisible()
     await expect(page.locator('link[rel="icon"], link[rel="shortcut icon"]').first()).toHaveCount(1)
     const description = await page.locator('meta[name="description"]').getAttribute('content')
     expect(description, 'missing description').toBeTruthy()
@@ -105,7 +105,7 @@ test.describe('qa', () => {
     test.setTimeout(90_000)
     await page.setViewportSize({ width: 390, height: 844 })
     await page.goto('./')
-    await expect(page.getByText('The Bible, told like a story')).toBeVisible()
+    await expect(page.getByText('Calm, sleep, and a moment to reflect')).toBeVisible()
     await page.goto('bible/GEN/1')
     await expect(page.getByLabel(/Verse 1\. In the beginning, God created/)).toBeVisible({ timeout: 20_000 })
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 8)

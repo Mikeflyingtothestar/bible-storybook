@@ -41,10 +41,12 @@ export default function MeScreen() {
             </Txt>
           </Pressable>
         ) : (
-          <Link href="/sign-in">
-            <Txt weight={700} color={colors.accent}>
-              Sign in
-            </Txt>
+          <Link href="/sign-in" asChild>
+            <Pressable accessibilityRole="link" accessibilityLabel="Sign in" style={{ minHeight: 44, justifyContent: 'center', alignSelf: 'flex-start' }}>
+              <Txt weight={700} color={colors.accent}>
+                Sign in
+              </Txt>
+            </Pressable>
           </Link>
         )}
       </Column>

@@ -1,4 +1,4 @@
-import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { copyFileSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -30,6 +30,22 @@ html = replaceTag(html, /<link rel="canonical"[^>]*>/, `<link rel="canonical" hr
 html = replaceTag(html, /<link rel="manifest"[^>]*>/, `<link rel="manifest" href="${site}/manifest.webmanifest" />`)
 html = replaceTag(html, /<meta http-equiv="Content-Security-Policy"[^>]*>/, `<meta http-equiv="Content-Security-Policy" content="${csp}" />`)
 html = replaceTag(html, /<meta name="theme-color"[^>]*>/, `<meta name="theme-color" content="#F7F4EE" />`)
+
+function findHero(dir) {
+  for (const entry of readdirSync(dir)) {
+    const full = path.join(dir, entry)
+    if (statSync(full).isDirectory()) {
+      const found = findHero(full)
+      if (found) return found
+    } else if (entry.startsWith('sunrise-sky.') && entry.endsWith('.webp')) return full
+  }
+  return null
+}
+const hero = findHero(distDir)
+if (hero) {
+  const href = `/bible-storybook/${path.relative(distDir, hero).split(path.sep).join('/')}`
+  html = replaceTag(html, /<link rel="preload" as="image"[^>]*>/, `<link rel="preload" as="image" href="${href}" />`)
+}
 
 writeFileSync(indexPath, html)
 writeFileSync(path.join(distDir, '404.html'), html)

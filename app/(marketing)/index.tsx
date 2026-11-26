@@ -58,11 +58,21 @@ const FEATURES: { icon: keyof typeof Feather.glyphMap; title: string; body: stri
   { icon: 'heart', title: 'Support', body: 'A mood check-in, verses for hard days, and crisis resources when needed.', image: 'sunrise' },
 ]
 
+const STEPS = [
+  { n: '1', title: 'Say what you need', body: 'Sleep, a quieter mind, or a morning that does not start loud. Today follows that choice.' },
+  { n: '2', title: 'Take a few minutes', body: 'A verse, a short prayer, or a wind-down that fades. Scripture is the ground, not a lecture.' },
+  { n: '3', title: 'Stop when you are done', body: 'The journal is private. A missed day rests the streak. Nothing here keeps score against you.' },
+]
+
 const FAQ = [
-  { q: 'Which Bible is this?', a: 'The bundled reading is the World English Bible, which is public domain. BSB and KJV are available when the library is seeded.' },
-  { q: 'Is there a weekly plan?', a: 'No. Pricing is monthly or annual only. Cancel anytime, no weekly billing, and no trial that turns into a charge.' },
-  { q: 'Is the companion a counsellor?', a: 'No. It repeats verses from the bundled text and can be wrong. It is not pastoral or medical advice.' },
-  { q: 'What if I miss a day?', a: 'The streak rests. A quiet day does not undo you, and nothing on the screen scolds you for it.' },
+  { q: 'What is free?', a: 'The daily verse, a short teaching, morning and night prayer, one sleep story, a small journal, and five companion questions a day. Paid plans are not on sale.' },
+  { q: 'Is this a church or a denomination?', a: 'No. It is not a church, a denomination, or a substitute for a congregation. It does not speak for one tradition.' },
+  { q: 'What do you keep about me?', a: 'A journal is saved to your account only after you sign in and press save. Mood stays on this device. A waitlist email is stored with the plan name and cannot be read back in the app. A signed-in companion stores a daily count, not the question. Details are on the privacy page.' },
+  { q: 'Is the companion a pastor or a therapist?', a: 'No. It quotes the bundled text and can be wrong. It is not a pastor, a therapist, or medical care. If you sound in distress, it points you to crisis lines.' },
+  { q: 'Does it work offline?', a: 'A few chapters travel with the app: Genesis 1, Psalms 23 and 121, Matthew 6, John 1 and John 3, plus the sleep stories that use them. The rest of the library needs a connection. There is no offline download yet.' },
+  { q: 'How do I cancel?', a: 'Nothing is billed, so there is nothing to cancel. Joining the waitlist does not start a subscription. When a paid plan exists it will be monthly or annual, cancel anytime, with no weekly charge and no trial that becomes a bill.' },
+  { q: 'Which text is the reading?', a: 'The bundled reading is the World English Bible, which is public domain. BSB and KJV appear when that library is seeded.' },
+  { q: 'What if I miss a day?', a: 'The streak rests. A quiet day does not undo you, and the screen does not scold you for it.' },
 ]
 
 export default function LandingPage() {
@@ -95,9 +105,9 @@ export default function LandingPage() {
       <Band background={colors.bg} pad={28}>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 28, alignItems: 'center', paddingTop: 20 }}>
           <View style={{ flexGrow: 1, flexBasis: 320, minWidth: 0, maxWidth: 560, gap: 18 }}>
-            <Txt size={14} weight={700} color={colors.accent} style={{ letterSpacing: 1.4 }}>DAILY VERSE</Txt>
-            <Txt size={46} weight={700} serif style={{ letterSpacing: -0.8, ...(Platform.OS === 'web' ? ({ textWrap: 'balance' } as object) : null) }}>The Bible, told like a story</Txt>
-            <Txt size={18} color={colors.muted} style={{ lineHeight: 28 }}>A few quiet minutes for faith, calm and reflection. Read a daily verse, listen when you want, and rest when the day is done.</Txt>
+            <Txt size={14} weight={700} color={colors.accent} style={{ letterSpacing: 1.4 }}>A FEW QUIET MINUTES</Txt>
+            <Txt size={46} weight={700} serif style={{ letterSpacing: -0.8, ...(Platform.OS === 'web' ? ({ textWrap: 'balance' } as object) : null) }}>Calm, sleep, and a moment to reflect</Txt>
+            <Txt size={18} color={colors.muted} style={{ lineHeight: 28 }}>Scripture is the ground under it. A short verse when you want one, a prayer you can finish, and a wind-down when the day is done.</Txt>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
               <Link href="/sign-up" asChild><Button label="Begin for free" /></Link>
               <Link href="/bible" asChild><Button label="Open the reader" variant="quiet" testID="open-reader" /></Link>
@@ -116,10 +126,15 @@ export default function LandingPage() {
         </View>
       </Band>
 
-      <Band background={wash} pad={28}>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 18, justifyContent: 'space-between' }}>
-          {['Public-domain Bible text', 'No weekly billing', 'Not medical advice', 'A few quiet minutes'].map((item) => (
-            <Txt key={item} weight={700}>{item}</Txt>
+      <Band background={wash} pad={64}>
+        <Txt size={40} weight={700} serif>How it works</Txt>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16, marginTop: 24 }}>
+          {STEPS.map((step) => (
+            <View key={step.n} style={{ flexGrow: 1, flexBasis: 240, minWidth: 0, gap: 8, padding: 20, borderRadius: 24, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}>
+              <Txt size={14} weight={700} color={colors.accent}>{step.n}</Txt>
+              <Txt size={22} weight={700} serif>{step.title}</Txt>
+              <Txt color={colors.muted}>{step.body}</Txt>
+            </View>
           ))}
         </View>
       </Band>
@@ -159,20 +174,12 @@ export default function LandingPage() {
       </Band>
 
       <Band background={colors.bg}>
-        <Txt size={40} weight={700} serif>Plans</Txt>
-        <Txt color={colors.muted} style={{ marginTop: 8, marginBottom: 20 }}>Monthly or annual. Cancel anytime, no weekly billing.</Txt>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16 }}>
-          {[
-            ['Free', '$0', 'Daily verse, a short teaching, a prayer, and a small journal.'],
-            ['Monthly', 'US$5.99', 'The fuller library, sleep catalog, and more companion questions. Coming soon.'],
-            ['Annual', 'US$39.99', 'A year of the same calm, for less than paying each month.'],
-          ].map(([name, price, body]) => (
-            <View key={name} {...lift} style={{ flexGrow: 1, flexBasis: 240, minWidth: 0, borderRadius: 24, padding: 24, gap: 8, backgroundColor: colors.surface, borderWidth: name === 'Annual' ? 2 : 1, borderColor: name === 'Annual' ? colors.accent : colors.border }}>
-              <Txt weight={700} color={colors.accent}>{name}</Txt>
-              <Txt size={32} weight={700} serif>{price}</Txt>
-              <Txt color={colors.muted}>{body}</Txt>
-            </View>
-          ))}
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 20, alignItems: 'center', justifyContent: 'space-between' }}>
+          <View style={{ flexGrow: 1, flexBasis: 280, minWidth: 0, gap: 8, maxWidth: 560 }}>
+            <Txt size={40} weight={700} serif>Free for now</Txt>
+            <Txt color={colors.muted} style={{ lineHeight: 26 }}>The daily practice is free. Monthly, annual, and family plans are a waitlist, not a checkout. No weekly billing, and no trial that turns into a charge.</Txt>
+          </View>
+          <Link href="/pricing" asChild><Button label="See plans" /></Link>
         </View>
       </Band>
 
@@ -188,12 +195,20 @@ export default function LandingPage() {
         <View style={{ marginTop: 28, paddingTop: 20, borderTopWidth: 1, borderTopColor: colors.border, flexDirection: 'row', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
           <View style={{ gap: 6, maxWidth: 360 }}>
             <Wordmark />
-            <Txt color={colors.muted}>Public-domain Bible text. A few quiet minutes. No leaderboards.</Txt>
+            <Txt color={colors.muted}>A few quiet minutes. Scripture underneath. No leaderboards, no invented praise.</Txt>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 }}>
+              <View accessibilityLabel="App Store, coming soon" style={{ minHeight: 44, paddingHorizontal: 14, borderRadius: 12, borderWidth: 1, borderColor: colors.border, justifyContent: 'center' }}>
+                <Txt size={13} weight={700}>App Store · coming soon</Txt>
+              </View>
+              <View accessibilityLabel="Google Play, coming soon" style={{ minHeight: 44, paddingHorizontal: 14, borderRadius: 12, borderWidth: 1, borderColor: colors.border, justifyContent: 'center' }}>
+                <Txt size={13} weight={700}>Google Play · coming soon</Txt>
+              </View>
+            </View>
           </View>
-          <View style={{ flexDirection: 'row', gap: 16 }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16 }}>
             <Link href="/privacy" asChild><Pressable accessibilityRole="link" style={{ minHeight: 44, justifyContent: 'center' }}><Txt weight={600} color={colors.accent}>Privacy</Txt></Pressable></Link>
             <Link href="/terms" asChild><Pressable accessibilityRole="link" style={{ minHeight: 44, justifyContent: 'center' }}><Txt weight={600} color={colors.accent}>Terms</Txt></Pressable></Link>
-            <Link href="/pricing" asChild><Pressable accessibilityRole="link" style={{ minHeight: 44, justifyContent: 'center' }}><Txt weight={600} color={colors.accent}>Pricing</Txt></Pressable></Link>
+            <Link href="/contact" asChild><Pressable accessibilityRole="link" style={{ minHeight: 44, justifyContent: 'center' }}><Txt weight={600} color={colors.accent}>Contact</Txt></Pressable></Link>
           </View>
         </View>
       </Band>

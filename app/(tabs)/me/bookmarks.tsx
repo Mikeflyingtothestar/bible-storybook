@@ -26,6 +26,8 @@ export default function BookmarksScreen() {
       <AppBar title="Bookmarks" backHref="/me" />
       <Column width={720} style={{ gap: 10 }}>
         {!user ? <Txt>Sign in to see bookmarks.</Txt> : null}
+        {user && query.isPending ? <Txt color={colors.muted}>Loading your bookmarks.</Txt> : null}
+        {user && query.isError ? <Txt color={colors.danger}>Bookmarks could not be loaded.</Txt> : null}
         {(query.data ?? []).map((row) => {
           const [book, chapter] = row.verses?.osis_ref.split('.') ?? []
           return (

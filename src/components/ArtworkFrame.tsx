@@ -24,6 +24,7 @@ export function ArtImage({
       width: 1600,
       height: 1000,
       loading: eager ? 'eager' : 'lazy',
+      fetchpriority: eager ? 'high' : 'auto',
       decoding: 'async',
       style: { width: '100%', height: '100%', objectFit: 'cover', display: 'block' },
     })

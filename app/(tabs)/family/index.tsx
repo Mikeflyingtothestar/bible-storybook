@@ -45,10 +45,12 @@ export default function FamilyScreen() {
         <AppBar title="Family" />
         <Column>
           <Txt>Sign in to create a family or join one with a code.</Txt>
-          <Link href="/sign-in">
-            <Txt weight={700} color={colors.accent}>
-              Sign in
-            </Txt>
+          <Link href="/sign-in" asChild>
+            <Pressable accessibilityRole="link" style={{ minHeight: 44, justifyContent: 'center', alignSelf: 'flex-start' }}>
+              <Txt weight={700} color={colors.accent}>
+                Sign in
+              </Txt>
+            </Pressable>
           </Link>
         </Column>
       </Screen>
@@ -63,10 +65,12 @@ export default function FamilyScreen() {
     <Screen>
       <AppBar title="Family" />
       <Column width={720} style={{ gap: 14 }}>
-        <Link href="/family/friends">
-          <Txt weight={700} color={colors.accent}>
-            Friends
-          </Txt>
+        <Link href="/family/friends" asChild>
+          <Pressable accessibilityRole="link" style={{ minHeight: 44, justifyContent: 'center', alignSelf: 'flex-start' }}>
+            <Txt weight={700} color={colors.accent}>
+              Friends
+            </Txt>
+          </Pressable>
         </Link>
         <Txt color={colors.muted}>Each person keeps their own reading and journal. A family plan simply gathers those profiles in one home.</Txt>
         {message ? <Txt color={colors.muted}>{message}</Txt> : null}
@@ -115,6 +119,7 @@ export default function FamilyScreen() {
                   <Pressable
                     accessibilityRole="button"
                     accessibilityLabel="Remove member"
+                    style={{ minHeight: 44, justifyContent: 'center', paddingHorizontal: 8 }}
                     onPress={() => {
                       void supabase
                         .from('family_members')
