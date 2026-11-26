@@ -61,12 +61,13 @@ export async function consumeCompanionQuestion(): Promise<{ remaining: number; s
   return { remaining: data, source: 'account' }
 }
 
-export async function saveLesson(userId: string, programmeId: string, lessonId: string, correct: boolean): Promise<DataError | null> {
+export async function saveLesson(userId: string, programmeId: string, lessonId: string, score: number): Promise<DataError | null> {
   if (programmeId.length < 1 || programmeId.length > 40 || lessonId.length < 1 || lessonId.length > 40) {
     return { code: 'validation', message: 'That lesson is not recognised.' }
   }
+  const quizScore = Math.max(0, Math.min(100, Math.round(score)))
   const { error } = await supabase.from('lesson_progress').upsert(
-    { user_id: userId, programme_id: programmeId, lesson_id: lessonId, completed: true, quiz_score: correct ? 100 : 0 },
+    { user_id: userId, programme_id: programmeId, lesson_id: lessonId, completed: true, quiz_score: quizScore },
     { onConflict: 'user_id,programme_id,lesson_id' },
   )
   return error ? fail(error) : null

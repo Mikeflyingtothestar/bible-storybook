@@ -1,10 +1,11 @@
 import { useKeepAwake } from 'expo-keep-awake'
 import { Link, useLocalSearchParams } from 'expo-router'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Pressable, Text, View } from 'react-native'
 
 import { bundledChapter } from '@/src/bible/sample'
-import { SLEEP_TIMER_CHOICES, fadeAmount, formatClock } from '@/src/bedtime/timer'
+import { AMBIENT_BEDS, startAmbience, type AmbientBed, type AmbientId } from '@/src/bedtime/ambience'
+import { NIGHT_TIMERS, SLEEP_TIMER_CHOICES, fadeAmount, formatClock, nightMinutes } from '@/src/bedtime/timer'
 import { fontSans, fontSerif } from '@/src/components/ui'
 import { useReadingSession } from '@/src/session/useReadingSession'
 import { bedtime } from '@/src/theme/tokens'
@@ -19,7 +20,7 @@ const READINGS: Record<string, { title: string; book: string; chapter: number; s
 }
 
 export default function BedtimePlayer() {
-  const { slug } = useLocalSearchParams<{ slug: string }>()
+  const { slug, minutes: minutesParam } = useLocalSearchParams<{ slug: string; minutes?: string }>()
   const reading = READINGS[String(slug)] ?? READINGS['psalm-23']
   const chapter = bundledChapter(reading.book, reading.chapter)
   const verses = (chapter?.verses ?? []).filter((verse) => {
@@ -28,7 +29,9 @@ export default function BedtimePlayer() {
     return true
   })
   const provider = useMemo(() => new DeviceVoiceProvider(), [])
-  const [minutes, setMinutes] = useState(15)
+  const [minutes, setMinutes] = useState(() => nightMinutes(minutesParam))
+  const [bedId, setBedId] = useState<AmbientId | null>(null)
+  const bedRef = useRef<AmbientBed | null>(null)
   const [playing, setPlaying] = useState(false)
   const [active, setActive] = useState<number | null>(null)
   const [endsAt, setEndsAt] = useState<number | null>(null)
@@ -38,7 +41,10 @@ export default function BedtimePlayer() {
   useKeepAwake()
   useReadingSession({ chapterId: null, mode: 'bedtime', completed: stoppedBy === 'story', enabled: playing || stoppedBy !== '' })
 
-  useEffect(() => () => provider.stop(), [provider])
+  useEffect(() => () => {
+    provider.stop()
+    bedRef.current?.stop()
+  }, [provider])
 
   useEffect(() => {
     if (!playing || !endsAt) return
@@ -47,6 +53,9 @@ export default function BedtimePlayer() {
       setRemaining(left)
       if (left <= 0) {
         provider.stop()
+        bedRef.current?.stop()
+        bedRef.current = null
+        setBedId(null)
         setPlaying(false)
         setStoppedBy('timer')
       }
@@ -72,8 +81,22 @@ export default function BedtimePlayer() {
 
   function stop(reason: 'user' | 'timer') {
     provider.stop()
+    bedRef.current?.stop()
+    bedRef.current = null
+    setBedId(null)
     setPlaying(false)
     setStoppedBy(reason)
+  }
+
+  function chooseBed(id: AmbientId) {
+    bedRef.current?.stop()
+    if (bedId === id) {
+      bedRef.current = null
+      setBedId(null)
+      return
+    }
+    bedRef.current = startAmbience(id)
+    setBedId(id)
   }
 
   const fade = fadeAmount(remaining)
@@ -87,9 +110,22 @@ export default function BedtimePlayer() {
         <Text style={{ color: bedtime.muted, fontFamily: fontSans(700) }} testID="timer-label">
           {playing ? formatClock(remaining) : `${minutes} minutes`}
         </Text>
+        <Text style={{ color: bedtime.muted, fontFamily: fontSans(700) }}>Sounds</Text>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+          {AMBIENT_BEDS.map((bed) => (
+            <Pressable key={bed.id} accessibilityRole="button" accessibilityLabel={`${bed.title} sound`} onPress={() => chooseBed(bed.id)} style={{ minHeight: 44, paddingHorizontal: 12, borderRadius: 999, justifyContent: 'center', backgroundColor: bedId === bed.id ? '#3A2E1C' : bedtime.surface }}>
+              <Text style={{ color: bedtime.text, fontFamily: fontSans(700) }}>{bed.title}</Text>
+            </Pressable>
+          ))}
+        </View>
         {!playing ? (
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-            {SLEEP_TIMER_CHOICES.map((choice) => (
+            {NIGHT_TIMERS.map((choice) => (
+              <Pressable key={choice} accessibilityRole="button" accessibilityLabel={`${choice} minute timer`} testID={`timer-${choice}`} onPress={() => setMinutes(choice)} style={{ minHeight: 44, paddingHorizontal: 12, borderRadius: 999, backgroundColor: minutes === choice ? '#3A2E1C' : bedtime.surface, justifyContent: 'center' }}>
+                <Text style={{ color: bedtime.text, fontFamily: fontSans(700) }}>{choice} min</Text>
+              </Pressable>
+            ))}
+            {SLEEP_TIMER_CHOICES.filter((choice) => !(NIGHT_TIMERS as readonly number[]).includes(choice)).map((choice) => (
               <Pressable key={choice} accessibilityRole="button" accessibilityLabel={`${choice} minute timer`} testID={`timer-${choice}`} onPress={() => setMinutes(choice)} style={{ minHeight: 44, paddingHorizontal: 12, borderRadius: 999, backgroundColor: minutes === choice ? '#3A2E1C' : bedtime.surface, justifyContent: 'center' }}>
                 <Text style={{ color: bedtime.text, fontFamily: fontSans(700) }}>{choice} min</Text>
               </Pressable>

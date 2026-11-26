@@ -6,7 +6,7 @@ import { Pressable, Text, View } from 'react-native'
 import { NATURE } from '@/src/art/images'
 import { Photo } from '@/src/components/Photo'
 import { fontSans, fontSerif } from '@/src/components/ui'
-import { SLEEP_TIMER_CHOICES } from '@/src/bedtime/timer'
+import { NIGHT_TIMERS } from '@/src/bedtime/timer'
 import { bedtime } from '@/src/theme/tokens'
 
 const READINGS = [
@@ -18,7 +18,7 @@ const READINGS = [
 
 export default function BedtimeHome() {
   const [selected, setSelected] = useState(READINGS[0]!)
-  const [minutes, setMinutes] = useState(10)
+  const [minutes, setMinutes] = useState<number>(15)
   return (
     <View style={{ flex: 1, backgroundColor: bedtime.bg }} testID="sleep">
       <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: 12, minHeight: 56 }}>
@@ -50,13 +50,13 @@ export default function BedtimeHome() {
       <View style={{ padding: 16, gap: 10, backgroundColor: bedtime.surface }}>
         <Text style={{ color: bedtime.text, fontFamily: fontSerif(700), fontSize: 18 }}>{selected.title}</Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-          {SLEEP_TIMER_CHOICES.filter((choice) => choice <= 15).map((choice) => (
+          {NIGHT_TIMERS.map((choice) => (
             <Pressable key={choice} accessibilityRole="button" accessibilityLabel={`${choice} minute timer`} onPress={() => setMinutes(choice)} style={{ minHeight: 44, paddingHorizontal: 12, borderRadius: 999, justifyContent: 'center', backgroundColor: minutes === choice ? '#3A2E1C' : bedtime.bg }}>
               <Text style={{ color: bedtime.text, fontFamily: fontSans(700) }}>{choice} min</Text>
             </Pressable>
           ))}
         </View>
-        <Link href={`/bedtime/play/${selected.slug}`} asChild>
+        <Link href={`/bedtime/play/${selected.slug}?minutes=${minutes}`} asChild>
           <Pressable accessibilityRole="link" accessibilityLabel="Play sleep story" style={{ minHeight: 52, borderRadius: 16, backgroundColor: '#3A2E1C', alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 8 }}>
             <Feather name="play" size={18} color={bedtime.text} />
             <Text style={{ color: bedtime.text, fontFamily: fontSans(700), fontSize: 18 }}>Play · {minutes} min</Text>

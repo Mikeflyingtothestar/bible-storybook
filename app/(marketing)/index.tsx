@@ -1,7 +1,7 @@
 import Feather from '@expo/vector-icons/Feather'
 import { Link } from 'expo-router'
 import { useState, type ReactNode } from 'react'
-import { Platform, Pressable, View, type ViewStyle } from 'react-native'
+import { Platform, Pressable, useWindowDimensions, View, type ViewStyle } from 'react-native'
 
 import { NATURE } from '@/src/art/images'
 import { Wordmark } from '@/src/components/Motifs'
@@ -77,6 +77,9 @@ const FAQ = [
 
 export default function LandingPage() {
   const { colors, name } = useAppTheme()
+  const { width } = useWindowDimensions()
+  const heroSize = width > 0 && width < 400 ? 32 : 46
+  const heroLine = width > 0 && width < 400 ? 36 : 54
   const wash = name === 'dark' ? '#1A2420' : '#F3EFE6'
   const glass = name === 'dark' ? 'rgba(18,22,20,0.86)' : 'rgba(247,244,238,0.88)'
   return (
@@ -106,7 +109,7 @@ export default function LandingPage() {
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 28, alignItems: 'center', paddingTop: 20 }}>
           <View style={{ flexGrow: 1, flexBasis: 320, minWidth: 0, maxWidth: 560, gap: 18 }}>
             <Txt size={14} weight={700} color={colors.accent} style={{ letterSpacing: 1.4 }}>A FEW QUIET MINUTES</Txt>
-            <Txt size={46} weight={700} serif style={{ letterSpacing: -0.8, ...(Platform.OS === 'web' ? ({ textWrap: 'balance' } as object) : null) }}>Calm, sleep, and a moment to reflect</Txt>
+            <Txt size={heroSize} weight={700} serif style={{ letterSpacing: -0.6, lineHeight: heroLine, ...(Platform.OS === 'web' ? ({ textWrap: 'balance' } as object) : null) }}>Calm, sleep, and a moment to reflect</Txt>
             <Txt size={18} color={colors.muted} style={{ lineHeight: 28 }}>Scripture is the ground under it. A short verse when you want one, a prayer you can finish, and a wind-down when the day is done.</Txt>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
               <Link href="/sign-up" asChild><Button label="Begin for free" /></Link>

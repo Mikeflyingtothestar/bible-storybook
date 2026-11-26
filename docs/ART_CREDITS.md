@@ -15,6 +15,8 @@ The pictures in the “Art through the ages” section are self-hosted WebP copi
 
 Local files live in `assets/art/` and use the same stems: `priscilla.webp`, `ravenna.webp`, `kells.webp`, `giotto.webp`, `rublev.webp`, `angelico.webp`, `rembrandt.webp`, `dore.webp`.
 
-The landing and app photographs `sunrise-sky.webp`, `still-water.webp`, and `soft-leaves.webp` are original images generated for this project. They are not stock photos and not historical art. The calm sleep tone is generated in the app and is not a recording.
+The landing and app photographs `sunrise-sky.webp`, `still-water.webp`, and `soft-leaves.webp` are original images generated for this project. They are not stock photos and not historical art.
+
+The sleep beds Rain, Water, Night air, and Soft tone are original sounds synthesised in the browser (`src/bedtime/ambience.ts`). They are not recordings, not from a paid library, and not copied from a third-party file. There is no separate license to credit. The guided wind-down is the device’s own speech reading the bundled public-domain text.
 
 The rose window and olive sprig elsewhere on the page are original SVG drawings, not reproductions of a manuscript.
