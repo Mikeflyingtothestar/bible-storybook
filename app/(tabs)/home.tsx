@@ -7,7 +7,7 @@ import { NATURE } from '@/src/art/images'
 import { AppBar, Button, Card, Column, Screen, Txt } from '@/src/components/ui'
 import { Photo } from '@/src/components/Photo'
 import { ProgressRing } from '@/src/components/ProgressRing'
-import { gratitudeStreak, streakMessage } from '@/src/journal/streak'
+import { gratitudeStreak, streakMessage, weekMarks } from '@/src/journal/streak'
 import { prayersFor } from '@/src/prayer/catalog'
 import { usePrefs } from '@/src/preferences/store'
 import { shareVerseImage } from '@/src/share/verseImage'
@@ -43,6 +43,7 @@ export default function TodayScreen() {
   const [listening, setListening] = useState(false)
   const support = encouragementFor(mood ?? 'calm')
   const streak = gratitudeStreak(openedDays, day)
+  const marks = weekMarks(openedDays, day)
 
   useEffect(() => {
     markOpened(day)
@@ -79,7 +80,7 @@ export default function TodayScreen() {
         <View style={{ flexDirection: wide ? 'row' : 'column', gap: 16, alignItems: 'flex-start' }}>
         <View style={{ flex: 1, minWidth: 0, width: wide ? undefined : '100%', gap: 16 }}>
         <View style={{ borderRadius: 28, overflow: 'hidden', position: 'relative', minHeight: 280 }}>
-          <Photo source={NATURE.sunrise} alt="Sunrise behind the daily verse" height={280} radius={28} />
+          <Photo source={NATURE.sunrise} alt="Sunrise behind the daily verse" height={280} radius={28} eager />
           <View style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, padding: 20, justifyContent: 'flex-end', gap: 12, backgroundColor: 'rgba(12,16,14,0.55)' }}>
             <Txt weight={700} color="#F7F4EE">Daily verse</Txt>
             <Txt serif size={teaching.verse.text.length > 110 ? 18 : 22} color="#F7F4EE" style={{ lineHeight: teaching.verse.text.length > 110 ? 26 : 30 }}>
@@ -125,7 +126,15 @@ export default function TodayScreen() {
         </View>
         <View style={{ width: wide ? 300 : '100%', gap: 16 }}>
         <Card>
-          <Txt weight={700}>{streakMessage(streak)}</Txt>
+          <Txt weight={700}>This week</Txt>
+          <View accessibilityLabel={`This week. ${marks.filter((mark) => mark.opened).map((mark) => mark.label).join(', ') || 'No days opened yet.'}`} style={{ flexDirection: 'row', gap: 4 }}>
+            {marks.map((mark) => (
+              <View key={mark.key} style={{ flex: 1, alignItems: 'center', gap: 6, minHeight: 44, justifyContent: 'center' }}>
+                <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: mark.opened ? colors.accent : colors.border, borderWidth: mark.isToday ? 2 : 0, borderColor: colors.text }} />
+                <Txt size={11} weight={mark.isToday ? 700 : 400} color={mark.isToday ? colors.text : colors.muted}>{mark.label}</Txt>
+              </View>
+            ))}
+          </View>
         </Card>
         <Card>
           <Txt weight={700}>How are you arriving?</Txt>

@@ -31,3 +31,20 @@ export function streakMessage(count: number): string {
   if (count <= 0) return 'A gentle start, whenever you are ready'
   return `🔥 ${count}-day streak · keep it gentle`
 }
+
+const WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const
+
+export type WeekMark = { key: string; label: (typeof WEEK)[number]; opened: boolean; isToday: boolean }
+
+/** Monday-first marks for the week that contains today. */
+export function weekMarks(localDates: readonly string[], today: string): WeekMark[] {
+  const marked = new Set(localDates)
+  const [year, month, day] = today.split('-').map(Number)
+  const date = new Date(Date.UTC(year ?? 1970, (month ?? 1) - 1, day ?? 1))
+  const weekday = date.getUTCDay()
+  const mondayOffset = weekday === 0 ? -6 : 1 - weekday
+  return WEEK.map((label, index) => {
+    const key = shift(today, mondayOffset + index)
+    return { key, label, opened: marked.has(key), isToday: key === today }
+  })
+}

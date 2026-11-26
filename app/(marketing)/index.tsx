@@ -99,12 +99,12 @@ export default function LandingPage() {
             <Txt size={46} weight={700} serif style={{ letterSpacing: -0.8, ...(Platform.OS === 'web' ? ({ textWrap: 'balance' } as object) : null) }}>The Bible, told like a story</Txt>
             <Txt size={18} color={colors.muted} style={{ lineHeight: 28 }}>A few quiet minutes for faith, calm and reflection. Read a daily verse, listen when you want, and rest when the day is done.</Txt>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
-              <Link href="/bible" asChild><Button label="Open the reader" testID="open-reader" /></Link>
-              <Link href="/home" asChild><Button label="See today" variant="quiet" /></Link>
+              <Link href="/sign-up" asChild><Button label="Begin for free" /></Link>
+              <Link href="/bible" asChild><Button label="Open the reader" variant="quiet" testID="open-reader" /></Link>
             </View>
           </View>
           <View style={{ flexGrow: 1, flexBasis: 300, minWidth: 0, position: 'relative' }}>
-            <Photo source={NATURE.sunrise} alt="Soft sunrise over a quiet horizon" height={420} radius={32} />
+            <Photo source={NATURE.sunrise} alt="Soft sunrise over a quiet horizon" height={420} radius={32} eager />
             <View style={{ position: 'absolute', right: 18, bottom: 18, width: 168, borderRadius: 28, padding: 10, backgroundColor: '#111', ...(Platform.OS === 'web' ? ({ boxShadow: '0 18px 40px rgba(28,25,23,0.25)' } as ViewStyle) : null) }}>
               <View style={{ borderRadius: 20, overflow: 'hidden', backgroundColor: '#F7F4EE', padding: 12, gap: 6 }}>
                 <Txt size={11} weight={700} color="#0E6B56">TODAY</Txt>
@@ -193,7 +193,7 @@ export default function LandingPage() {
           <View style={{ flexDirection: 'row', gap: 16 }}>
             <Link href="/privacy" asChild><Pressable accessibilityRole="link" style={{ minHeight: 44, justifyContent: 'center' }}><Txt weight={600} color={colors.accent}>Privacy</Txt></Pressable></Link>
             <Link href="/terms" asChild><Pressable accessibilityRole="link" style={{ minHeight: 44, justifyContent: 'center' }}><Txt weight={600} color={colors.accent}>Terms</Txt></Pressable></Link>
-            <Link href="/paywall" asChild><Pressable accessibilityRole="link" style={{ minHeight: 44, justifyContent: 'center' }}><Txt weight={600} color={colors.accent}>Pricing</Txt></Pressable></Link>
+            <Link href="/pricing" asChild><Pressable accessibilityRole="link" style={{ minHeight: 44, justifyContent: 'center' }}><Txt weight={600} color={colors.accent}>Pricing</Txt></Pressable></Link>
           </View>
         </View>
       </Band>
