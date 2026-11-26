@@ -13,6 +13,10 @@ body,
   outline-offset: 3px;
 }
 
+html[data-theme='dark'] :focus-visible {
+  outline-color: #9ed9c8;
+}
+
 @keyframes breathe {
   0%,
   100% {

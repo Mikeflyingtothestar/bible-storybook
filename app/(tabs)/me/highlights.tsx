@@ -26,6 +26,9 @@ export default function HighlightsScreen() {
       <AppBar title="Highlights" backHref="/me" />
       <Column width={720} style={{ gap: 10 }}>
         {!user ? <Txt>Sign in to see highlights and notes.</Txt> : null}
+        {user && query.isPending ? <Txt color={colors.muted}>Loading your highlights.</Txt> : null}
+        {user && query.isError ? <Txt color={colors.danger}>Highlights could not be loaded.</Txt> : null}
+        {user && query.data && query.data.length === 0 ? <Txt color={colors.muted}>No highlights yet. Open a verse and mark one.</Txt> : null}
         {(query.data ?? []).map((row) => {
           const [book, chapter] = row.verses?.osis_ref.split('.') ?? []
           return (

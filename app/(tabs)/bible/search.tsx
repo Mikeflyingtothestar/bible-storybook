@@ -55,7 +55,7 @@ export default function SearchScreen() {
               key={`${hit.source}-${hit.osisRef}`}
               accessibilityRole="button"
               onPress={() => router.push(`/bible/${hit.book}/${hit.chapter}`)}
-              style={{ padding: 12, borderRadius: 14, backgroundColor: colors.surface }}
+              style={{ minHeight: 44, padding: 12, borderRadius: 14, backgroundColor: colors.surface }}
             >
               <Txt weight={800} color={colors.accent}>
                 {referenceLabel(hit.book, hit.chapter, hit.number)}

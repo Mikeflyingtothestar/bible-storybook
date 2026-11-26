@@ -6,7 +6,7 @@ test('capture light and dark screens', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
   for (const theme of ['light', 'dark'] as const) {
     await page.goto(`/bible-storybook/?theme=${theme}`)
-    await expect(page.getByText('The Bible, told like a story')).toBeVisible()
+    await expect(page.getByText('Calm, sleep, and a moment to reflect')).toBeVisible()
     await page.screenshot({ path: `${out}/landing-${theme}.png` })
 
     await page.goto('/bible-storybook/sign-in')

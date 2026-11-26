@@ -2,7 +2,10 @@ import { expect, test } from '@playwright/test'
 
 test('landing, sign-up, reader, bookmark, theme, and bedtime timer', async ({ page }) => {
   await page.goto('/bible-storybook/')
-  await expect(page.getByText('The Bible, told like a story')).toBeVisible()
+  await expect(page.getByText('Calm, sleep, and a moment to reflect')).toBeVisible()
+  await expect(page.getByText('How it works')).toBeVisible()
+  await expect(page.getByRole('link', { name: 'See plans' })).toBeVisible()
+  await expect(page.getByText('App Store · coming soon')).toBeVisible()
   await page.getByTestId('sign-up-link').click()
   await expect(page.getByTestId('email')).toBeVisible()
   await expect(page.getByTestId('password')).toBeVisible()
