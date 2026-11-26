@@ -28,7 +28,6 @@ export function gratitudeStreak(localDates: readonly string[], today: string): n
 
 /** A missed day pauses the count. The words never scold. */
 export function streakMessage(count: number): string {
-  if (count <= 0) return 'No streak to protect. Come back any day. A quiet day does not undo you.'
-  if (count === 1) return 'You showed up today. That is the whole streak.'
-  return `${count} gentle days. If you miss one, the count simply rests.`
+  if (count <= 0) return 'A gentle start, whenever you are ready'
+  return `🔥 ${count}-day streak · keep it gentle`
 }

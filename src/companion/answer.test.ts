@@ -5,7 +5,7 @@ import { callCompanionLlm, COMPANION_LLM_ENABLED } from './llm'
 import { gratitudeStreak } from '../journal/streak'
 import { quizCorrect, PROGRAMMES, lessonProgress } from '../learn/programmes'
 import { dailyTeaching } from '../teachings/daily'
-import { isWaitlistPlan } from '../pricing/plans'
+import { isWaitlistEmail, isWaitlistPlan } from '../pricing/plans'
 import { topicsForIntentions } from '../wellness/goals'
 import { encouragementFor, supportForNote } from '../support/mood'
 
@@ -52,6 +52,8 @@ describe('daily pieces', () => {
   it('marks paid plans for the waitlist only', () => {
     expect(isWaitlistPlan('premium-monthly')).toBe(true)
     expect(isWaitlistPlan('free')).toBe(false)
+    expect(isWaitlistEmail('reader@example.com')).toBe(true)
+    expect(isWaitlistEmail('not-an-email')).toBe(false)
   })
 
   it('scores a lesson and tracks progress', () => {

@@ -1,7 +1,7 @@
 import Feather from '@expo/vector-icons/Feather'
 import { Link } from 'expo-router'
 import { useEffect, useState } from 'react'
-import { Pressable, View } from 'react-native'
+import { Pressable, useWindowDimensions, View } from 'react-native'
 
 import { NATURE } from '@/src/art/images'
 import { AppBar, Button, Card, Column, Screen, Txt } from '@/src/components/ui'
@@ -31,9 +31,13 @@ export default function TodayScreen() {
   const markOpened = usePrefs((state) => state.markOpened)
   const setLikedVerse = usePrefs((state) => state.setLikedVerse)
   const setMood = usePrefs((state) => state.setMood)
+  const preferred = usePrefs((state) => state.preferredTime)
+  const { width } = useWindowDimensions()
+  const wide = width >= 1100
   const day = dayKey(new Date())
   const teaching = weekTeaching(topicsForIntentions(intentions), new Date())
-  const prayer = prayersFor('morning')[0]
+  const prayer = prayersFor(preferred === 'evening' ? 'evening' : 'morning')[0]
+  const greeting = preferred === 'evening' ? 'Good evening' : 'Good morning'
   const checks = today.day === day ? today : { day, verse: false, teaching: false, prayer: false, journal: false }
   const [shareNote, setShareNote] = useState<string | null>(null)
   const [listening, setListening] = useState(false)
@@ -64,14 +68,16 @@ export default function TodayScreen() {
   return (
     <Screen testID="today">
       <AppBar title="Today" />
-      <Column width={720} style={{ gap: 16 }}>
+      <Column width={wide ? 1100 : 720} style={{ gap: 16 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
           <View style={{ flex: 1, gap: 6 }}>
-            <Txt size={34} weight={700} serif>Good morning</Txt>
+            <Txt size={34} weight={700} serif>{greeting}</Txt>
             <Txt color={colors.muted}>{streakMessage(streak)}</Txt>
           </View>
           <ProgressRing done={Number(checks.verse) + Number(checks.teaching) + Number(checks.prayer)} total={3} />
         </View>
+        <View style={{ flexDirection: wide ? 'row' : 'column', gap: 16, alignItems: 'flex-start' }}>
+        <View style={{ flex: 1, minWidth: 0, width: wide ? undefined : '100%', gap: 16 }}>
         <View style={{ borderRadius: 28, overflow: 'hidden', position: 'relative', minHeight: 280 }}>
           <Photo source={NATURE.sunrise} alt="Sunrise behind the daily verse" height={280} radius={28} />
           <View style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, padding: 20, justifyContent: 'flex-end', gap: 12, backgroundColor: 'rgba(12,16,14,0.55)' }}>
@@ -116,6 +122,11 @@ export default function TodayScreen() {
         <Link href="/journal" asChild>
           <Button label="Open journal" variant="quiet" />
         </Link>
+        </View>
+        <View style={{ width: wide ? 300 : '100%', gap: 16 }}>
+        <Card>
+          <Txt weight={700}>{streakMessage(streak)}</Txt>
+        </Card>
         <Card>
           <Txt weight={700}>How are you arriving?</Txt>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
@@ -145,6 +156,8 @@ export default function TodayScreen() {
               <Photo source={NATURE.water} alt="Still water for sleep" height={140} />
             </Pressable>
           </Link>
+        </View>
+        </View>
         </View>
       </Column>
     </Screen>

@@ -35,6 +35,7 @@ type Preferences = {
   openedDays: string[]
   likedVerse: string | null
   eveningReminder: boolean
+  preferredTime: 'morning' | 'evening' | 'flexible'
   morningTime: string
   eveningTime: string
   prayerMinutes: 2 | 5 | 10
@@ -53,6 +54,7 @@ type Preferences = {
   markOpened: (day: string) => void
   setLikedVerse: (likedVerse: string | null) => void
   setEveningReminder: (eveningReminder: boolean) => void
+  setPreferredTime: (preferredTime: 'morning' | 'evening' | 'flexible') => void
   setMorningTime: (morningTime: string) => void
   setEveningTime: (eveningTime: string) => void
   setPrayerMinutes: (prayerMinutes: 2 | 5 | 10) => void
@@ -101,6 +103,7 @@ export const usePrefs = create<Preferences>()(
       openedDays: [],
       likedVerse: null,
       eveningReminder: false,
+      preferredTime: 'flexible',
       morningTime: '07:30',
       eveningTime: '21:00',
       prayerMinutes: 5,
@@ -128,6 +131,7 @@ export const usePrefs = create<Preferences>()(
       markOpened: (day) => set((state) => ({ openedDays: state.openedDays.includes(day) ? state.openedDays : [...state.openedDays, day].slice(-400) })),
       setLikedVerse: (likedVerse) => set({ likedVerse }),
       setEveningReminder: (eveningReminder) => set({ eveningReminder }),
+      setPreferredTime: (preferredTime) => set({ preferredTime }),
       setMorningTime: (morningTime) => set({ morningTime }),
       setEveningTime: (eveningTime) => set({ eveningTime }),
       setPrayerMinutes: (prayerMinutes) => set({ prayerMinutes }),
@@ -153,6 +157,7 @@ export const usePrefs = create<Preferences>()(
         openedDays: state.openedDays,
         likedVerse: state.likedVerse,
         eveningReminder: state.eveningReminder,
+        preferredTime: state.preferredTime,
         morningTime: state.morningTime,
         eveningTime: state.eveningTime,
         prayerMinutes: state.prayerMinutes,

@@ -23,7 +23,7 @@ test('capture light and dark screens', async ({ page }) => {
   }
 
   await page.goto('/bible-storybook/bedtime')
-  await expect(page.getByText('Psalm 23')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Psalm 23' })).toBeVisible()
   await page.screenshot({ path: `${out}/bedtime-picker.png` })
   await page.goto('/bible-storybook/bedtime/play/psalm-23')
   await expect(page.getByText(/The LORD is my shepherd/)).toBeVisible()

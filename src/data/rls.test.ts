@@ -27,6 +27,13 @@ describe('row level security', () => {
     }
   })
 
+  it('lets anyone insert a validated waitlist row and nothing else', () => {
+    expect(sql).toContain('create policy "plan waitlist insert" on public.plan_waitlist')
+    expect(sql).toContain('for insert to anon, authenticated')
+    expect(sql).not.toContain('on public.plan_waitlist for select')
+    expect(sql).toContain('grant insert on table public.plan_waitlist to anon, authenticated')
+  })
+
   it('gives owner-only access on the wellness tables', () => {
     for (const table of ['journal_entries', 'gratitude_entries', 'mood_checkins', 'waitlist_signups', 'companion_messages', 'user_topics', 'prayer_reminders', 'lesson_progress']) {
       expect(sql).toContain(`on public.${table} for all to authenticated`)

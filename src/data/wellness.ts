@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase'
-import { isWaitlistPlan } from '../pricing/plans'
+import { isWaitlistEmail, isWaitlistPlan } from '../pricing/plans'
 import { isTopic } from '../wellness/topics'
 import { mapDataError, type DataError } from './errors'
 
@@ -45,11 +45,20 @@ export async function saveTopics(userId: string, topics: string[]): Promise<Data
   return error ? fail(error) : null
 }
 
-export async function joinWaitlist(userId: string, plan: string): Promise<DataError | null> {
-  if (!isWaitlistPlan(plan)) return { code: 'validation', message: 'That plan is not on the waitlist.' }
-  const { error } = await supabase.from('waitlist_signups').insert({ user_id: userId, plan })
+/** Insert-only. A duplicate email for the same plan is treated as already joined. */
+export async function joinWaitlist(email: string, plan: string): Promise<DataError | null> {
+  if (!isWaitlistPlan(plan)) return { code: 'validation', message: 'Choose Monthly, Annual, or Family.' }
+  if (!isWaitlistEmail(email)) return { code: 'validation', message: 'Enter a valid email address.' }
+  const { error } = await supabase.from('plan_waitlist').insert({ email: email.trim().toLowerCase(), plan })
   if (error?.code === '23505') return null
   return error ? fail(error) : null
+}
+
+/** Signed-in quota lives in use_companion_question. Guests stay on this device. */
+export async function consumeCompanionQuestion(): Promise<{ remaining: number; source: 'account' | 'device' }> {
+  const { data, error } = await supabase.rpc('use_companion_question')
+  if (error || typeof data !== 'number') return { remaining: -1, source: 'device' }
+  return { remaining: data, source: 'account' }
 }
 
 export async function saveLesson(userId: string, programmeId: string, lessonId: string, correct: boolean): Promise<DataError | null> {

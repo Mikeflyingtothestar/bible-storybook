@@ -1,11 +1,11 @@
+import Feather from '@expo/vector-icons/Feather'
 import { Link } from 'expo-router'
 import { useState } from 'react'
-import { View } from 'react-native'
-import Feather from '@expo/vector-icons/Feather'
+import { TextInput, View } from 'react-native'
 
-import { useAuth } from '@/src/auth/AuthProvider'
-import { Button, Card, Column, Screen, Txt } from '@/src/components/ui'
+import { Button, Card, Column, Screen, Txt, fontSans } from '@/src/components/ui'
 import { joinWaitlist } from '@/src/data/wellness'
+import { isWaitlistEmail } from '@/src/pricing/plans'
 import { PLANS } from '@/src/pricing/plans'
 import { useAppTheme } from '@/src/theme/ThemeProvider'
 
@@ -15,8 +15,9 @@ export function upgradeMessage(): string {
 
 export default function Paywall() {
   const { colors } = useAppTheme()
-  const { user } = useAuth()
+  const [email, setEmail] = useState('')
   const [note, setNote] = useState<string | null>(null)
+  const [joined, setJoined] = useState(false)
   return (
     <Screen testID="paywall">
       <Column width={1040} style={{ paddingTop: 28, gap: 18 }}>
@@ -30,6 +31,7 @@ export default function Paywall() {
           <Txt serif size={28}>$0</Txt>
           <Txt color={colors.muted}>Daily verse, a short teaching, morning and night prayer, and a small journal. This is yours now.</Txt>
         </Card>
+        <TextInput accessibilityLabel="Email" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" placeholder="Email for the waitlist" placeholderTextColor={colors.muted} style={{ minHeight: 48, borderWidth: 1, borderColor: colors.border, borderRadius: 14, paddingHorizontal: 14, color: colors.text, fontFamily: fontSans(), backgroundColor: colors.surface }} />
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16 }}>
           {PLANS.map((plan) => (
             <View key={plan.id} style={{ flexGrow: 1, flexBasis: 260, minWidth: 0 }}>
@@ -45,11 +47,23 @@ export default function Paywall() {
                   </View>
                 ))}
                 <Button
-                  label="Join the waitlist"
+                  label={joined ? 'You’re on the list' : 'Join the waitlist'}
                   testID={plan.id === 'premium-monthly' ? 'upgrade' : undefined}
                   onPress={() => {
-                    setNote(upgradeMessage())
-                    if (user) void joinWaitlist(user.id, plan.id)
+                    if (!isWaitlistEmail(email)) {
+                      setNote('Enter a valid email address.')
+                      setJoined(false)
+                      return
+                    }
+                    void joinWaitlist(email, plan.id).then((error) => {
+                      if (error && error.code !== 'conflict') {
+                        setJoined(false)
+                        setNote(error.message)
+                        return
+                      }
+                      setJoined(true)
+                      setNote(upgradeMessage())
+                    })
                   }}
                 />
               </Card>
@@ -57,8 +71,8 @@ export default function Paywall() {
           ))}
         </View>
         {note ? (
-          <View testID="upgrade-note">
-            <Txt weight={700}>{note}</Txt>
+          <View testID={joined ? 'waitlist-success' : 'upgrade-note'}>
+            <Txt weight={700}>{joined ? 'You’re on the list. We’ll write when plans open.' : note}</Txt>
           </View>
         ) : null}
       </Column>

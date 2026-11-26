@@ -29,7 +29,7 @@ export default function AuthCallback() {
         router.replace('/auth/update-password')
         return
       }
-      if (hasSession) router.replace(onboardingDone ? '/home' : '/version')
+      if (hasSession) router.replace(onboardingDone ? '/home' : '/intentions')
       else setMessage('We could not find a session. Request a new link and try again.')
     }
 

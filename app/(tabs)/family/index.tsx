@@ -68,7 +68,7 @@ export default function FamilyScreen() {
             Friends
           </Txt>
         </Link>
-        <Txt color={colors.muted}>Each person already has a profile. Shared plans stay on that account. This is groundwork, not a second login.</Txt>
+        <Txt color={colors.muted}>Each person keeps their own reading and journal. A family plan simply gathers those profiles in one home.</Txt>
         {message ? <Txt color={colors.muted}>{message}</Txt> : null}
         {!family.data?.group ? (
           <Card>

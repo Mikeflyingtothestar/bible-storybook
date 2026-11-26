@@ -160,12 +160,12 @@ export default function LandingPage() {
 
       <Band background={colors.bg}>
         <Txt size={40} weight={700} serif>Plans</Txt>
-        <Txt color={colors.muted} style={{ marginTop: 8, marginBottom: 20 }}>Monthly or annual only. Cancel anytime, no weekly billing. Nothing on this page can be purchased.</Txt>
+        <Txt color={colors.muted} style={{ marginTop: 8, marginBottom: 20 }}>Monthly or annual. Cancel anytime, no weekly billing.</Txt>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16 }}>
           {[
             ['Free', '$0', 'Daily verse, a short teaching, a prayer, and a small journal.'],
             ['Monthly', 'US$5.99', 'The fuller library, sleep catalog, and more companion questions. Coming soon.'],
-            ['Annual', 'US$39.99', 'The same set, once a year. Best value when billing exists.'],
+            ['Annual', 'US$39.99', 'A year of the same calm, for less than paying each month.'],
           ].map(([name, price, body]) => (
             <View key={name} {...lift} style={{ flexGrow: 1, flexBasis: 240, minWidth: 0, borderRadius: 24, padding: 24, gap: 8, backgroundColor: colors.surface, borderWidth: name === 'Annual' ? 2 : 1, borderColor: name === 'Annual' ? colors.accent : colors.border }}>
               <Txt weight={700} color={colors.accent}>{name}</Txt>

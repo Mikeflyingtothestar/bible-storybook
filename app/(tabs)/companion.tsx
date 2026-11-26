@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { Platform, Pressable, ScrollView, TextInput, View, type ViewStyle } from 'react-native'
 
+import { useAuth } from '@/src/auth/AuthProvider'
 import { answerQuestion, type CompanionResult } from '@/src/companion/answer'
 import { callCompanionLlm } from '@/src/companion/llm'
 import { NATURE } from '@/src/art/images'
 import { AppBar, Card, Screen, Txt, fontSans } from '@/src/components/ui'
 import { Photo } from '@/src/components/Photo'
+import { consumeCompanionQuestion } from '@/src/data/wellness'
 import { usePrefs } from '@/src/preferences/store'
 import { dayKey } from '@/src/teachings/daily'
 import { useAppTheme } from '@/src/theme/ThemeProvider'
@@ -19,6 +21,7 @@ export default function CompanionScreen() {
   const companionDay = usePrefs((state) => state.companionDay)
   const companionCount = usePrefs((state) => state.companionCount)
   const noteAsk = usePrefs((state) => state.noteCompanionAsk)
+  const { user } = useAuth()
   const [question, setQuestion] = useState('')
   const [result, setResult] = useState<CompanionResult | null>(null)
   const [asked, setAsked] = useState('')
@@ -37,7 +40,13 @@ export default function CompanionScreen() {
     setTyping(true)
     await new Promise((resolve) => setTimeout(resolve, 400))
     setTyping(false)
-    if (remaining <= 0) {
+    if (user) {
+      const quota = await consumeCompanionQuestion()
+      if (quota.source === 'account' && quota.remaining <= 0) {
+        setResult({ kind: 'need-more', text: 'Five questions are included today. Calm stays open.', disclaimer: 'Answers quote the Bible. Not pastoral or medical advice.' })
+        return
+      }
+    } else if (remaining <= 0) {
       setResult({ kind: 'need-more', text: 'Five questions are included today. Calm stays open.', disclaimer: 'Answers quote the Bible. Not pastoral or medical advice.' })
       return
     }
@@ -117,7 +126,9 @@ export default function CompanionScreen() {
               <Txt weight={700} color={colors.onAccent}>↑</Txt>
             </Pressable>
           </View>
-          <Txt size={12} color={colors.muted} style={{ textAlign: 'center' }}>Answers quote the Bible. Not pastoral or medical advice.</Txt>
+          <Txt size={12} color={colors.muted} style={{ textAlign: 'center' }}>
+            Answers quote the Bible. Not pastoral or medical advice.{user ? '' : ' Counted on this device until you sign in.'}
+          </Txt>
         </View>
       </View>
     </Screen>

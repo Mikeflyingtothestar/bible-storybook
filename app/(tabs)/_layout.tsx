@@ -62,8 +62,11 @@ export default function TabLayout() {
       <View style={{ flex: 1 }}>
         <Tabs
           tabBar={(props) => {
-            const bar = props as unknown as { state: { index: number; routes: { key: string; name: string }[] }; navigation: { navigate: (name: string) => void } }
-            return wide ? <View /> : <PhoneTabs state={bar.state} navigation={bar.navigation} bottom={insets.bottom} />
+            const bar = props as unknown as {
+              state: { index: number; routes: { key: string; name: string }[] }
+              descriptors: Record<string, { navigation: { navigate: (name: string) => void } }>
+            }
+            return wide ? <View /> : <PhoneTabs state={bar.state} descriptors={bar.descriptors} bottom={insets.bottom} />
           }}
           screenOptions={{
             headerShown: false,
@@ -97,18 +100,19 @@ const PHONE_TABS = [
 
 function PhoneTabs({
   state,
-  navigation,
+  descriptors,
   bottom,
 }: {
   state: { index: number; routes: { key: string; name: string }[] }
-  navigation: { navigate: (name: string) => void }
+  descriptors: Record<string, { navigation: { navigate: (name: string) => void } }>
   bottom: number
 }) {
   const { colors } = useAppTheme()
   return (
     <View style={{ flexDirection: 'row', alignItems: 'stretch', backgroundColor: colors.bg, borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 6, paddingBottom: Math.max(bottom, 8) }}>
       {PHONE_TABS.map((item) => {
-        const index = state.routes.findIndex((route) => route.name === item.name)
+        const route = state.routes.find((entry) => entry.name === item.name)
+        const index = state.routes.findIndex((entry) => entry.name === item.name)
         const active = state.index === index
         return (
           <Pressable
@@ -116,7 +120,9 @@ function PhoneTabs({
             accessibilityRole="tab"
             accessibilityLabel={item.label}
             accessibilityState={{ selected: active }}
-            onPress={() => navigation.navigate(item.name)}
+            onPress={() => {
+              if (route) descriptors[route.key]?.navigation.navigate(route.name)
+            }}
             style={{ flex: 1, minWidth: 0, minHeight: 52, alignItems: 'center', justifyContent: 'center', gap: 2, paddingHorizontal: 2 }}
           >
             <Feather name={item.icon} size={20} color={active ? colors.accent : colors.muted} />
