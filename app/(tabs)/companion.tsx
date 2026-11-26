@@ -1,8 +1,9 @@
-import { useState } from 'react'
-import { Platform, Pressable, ScrollView, TextInput, View, type ViewStyle } from 'react-native'
+import { createElement, useState } from 'react'
+import { Linking, Platform, Pressable, ScrollView, TextInput, View, type ViewStyle } from 'react-native'
 
 import { useAuth } from '@/src/auth/AuthProvider'
-import { answerQuestion, COMPANION_DISCLAIMER, type CompanionResult } from '@/src/companion/answer'
+import { answerQuestion, COMPANION_DISCLAIMER, CRISIS_RESOURCES, type CompanionResult } from '@/src/companion/answer'
+import type { CitedVerse } from '@/src/wellness/bundled'
 import { guideFor, TOPIC_GUIDES } from '@/src/companion/library'
 import { callCompanionLlm } from '@/src/companion/llm'
 import { NATURE } from '@/src/art/images'
@@ -38,11 +39,12 @@ export default function CompanionScreen() {
   function openTopic(id: TopicId) {
     const guide = guideFor(id)
     setAsked(guide.title)
+    setQuestion('')
     setResult({
       kind: 'answer',
-      text: `${guide.reflection} A short prayer: ${guide.prayer}`,
+      reflection: guide.reflection,
+      prayer: guide.prayer,
       citations: guide.refs.map((ref) => requireVerse(ref)),
-      crisis: null,
       disclaimer: COMPANION_DISCLAIMER,
     })
   }
@@ -50,21 +52,27 @@ export default function CompanionScreen() {
   async function ask(text?: string) {
     const query = (text ?? question).trim()
     if (!query) return
+    setQuestion('')
     setAsked(query)
+    const next = answerQuestion(query)
+    if (next.kind === 'crisis') {
+      setTyping(false)
+      setResult(next)
+      return
+    }
     setTyping(true)
     await new Promise((resolve) => setTimeout(resolve, 400))
     setTyping(false)
     if (user) {
       const quota = await consumeCompanionQuestion()
       if (quota.source === 'account' && quota.remaining <= 0) {
-        setResult({ kind: 'need-more', text: 'Five questions are included today. Calm stays open.', disclaimer: 'Answers quote the Bible. Not pastoral or medical advice.' })
+        setResult({ kind: 'need-more', text: 'Five questions are included today. Calm stays open.', disclaimer: COMPANION_DISCLAIMER })
         return
       }
     } else if (remaining <= 0) {
-      setResult({ kind: 'need-more', text: 'Five questions are included today. Calm stays open.', disclaimer: 'Answers quote the Bible. Not pastoral or medical advice.' })
+      setResult({ kind: 'need-more', text: 'Five questions are included today. Calm stays open.', disclaimer: COMPANION_DISCLAIMER })
       return
     }
-    const next = answerQuestion(query)
     setResult(next)
     if (next.kind === 'answer') {
       noteAsk(day)
@@ -106,25 +114,30 @@ export default function CompanionScreen() {
               <Txt color={colors.muted}>Looking up a verse…</Txt>
             </View>
           ) : null}
-          {result ? (
-            <View style={{ alignSelf: 'flex-start', maxWidth: '92%', gap: 8 }}>
-              {result.kind === 'answer' && result.crisis ? (
-                <View testID="crisis-card" style={{ borderRadius: 18, padding: 14, gap: 6, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.danger }}>
-                  <Txt weight={700}>This is not a therapist.</Txt>
-                  <Txt>If you might harm yourself, contact local emergency services. findahelpline.com lists lines by country. Befrienders Malaysia is one place to start.</Txt>
-                </View>
+          {result?.kind === 'crisis' ? <CrisisCard verse={result.verse} /> : null}
+          {result?.kind === 'need-more' ? (
+            <View style={{ borderRadius: 18, padding: 14, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}>
+              <Txt>{result.text}</Txt>
+            </View>
+          ) : null}
+          {result?.kind === 'answer' ? (
+            <View style={{ gap: 8 }} testID="answer-card">
+              {result.citations.map((verse) => (
+                <Card key={verse.osisRef}>
+                  <Txt weight={700} color={colors.accent}>{verse.label}</Txt>
+                  <Txt serif>{verse.text}</Txt>
+                </Card>
+              ))}
+              <Card>
+                <Txt weight={700}>Reflection</Txt>
+                <Txt>{result.reflection}</Txt>
+              </Card>
+              {result.prayer ? (
+                <Card>
+                  <Txt weight={700}>Prayer</Txt>
+                  <Txt>{result.prayer}</Txt>
+                </Card>
               ) : null}
-              <View style={{ borderRadius: 18, padding: 14, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}>
-                <Txt>{result.text}</Txt>
-              </View>
-              {result.kind === 'answer'
-                ? result.citations.map((verse) => (
-                    <Card key={verse.osisRef}>
-                      <Txt weight={700} color={colors.accent}>{verse.label}</Txt>
-                      <Txt serif>{verse.text}</Txt>
-                    </Card>
-                  ))
-                : null}
               <Txt size={12} color={colors.muted}>{result.disclaimer}</Txt>
             </View>
           ) : null}
@@ -157,5 +170,34 @@ export default function CompanionScreen() {
         </View>
       </View>
     </Screen>
+  )
+}
+
+function CrisisCard({ verse }: { verse: CitedVerse }) {
+  return (
+    <View testID="crisis-card" style={{ borderRadius: 20, padding: 16, gap: 10, backgroundColor: '#1C1412', borderWidth: 2, borderColor: '#F3E0B8' }}>
+      <Txt size={22} weight={700} color="#FFF7F0">You don’t have to go through this alone</Txt>
+      <Txt color="#FFF7F0">Call your local emergency number.</Txt>
+      <Txt size={13} weight={700} color="#F3E0B8">This is not a therapist.</Txt>
+      <CrisisLink href={CRISIS_RESOURCES.findAHelpline} label="Find a helpline" />
+      <CrisisLink href={CRISIS_RESOURCES.befriendersWorldwide} label="Befrienders Worldwide" />
+      <View style={{ borderRadius: 16, padding: 12, gap: 6, backgroundColor: '#FFF7F0' }}>
+        <Txt weight={700} color="#1C1412">{verse.label}</Txt>
+        <Txt serif color="#1C1412">{verse.text}</Txt>
+      </View>
+      <Txt weight={700} color="#FFF7F0">Talk to someone you trust.</Txt>
+    </View>
+  )
+}
+
+function CrisisLink({ href, label }: { href: string; label: string }) {
+  const style = { display: 'flex', minHeight: 48, borderRadius: 999, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF7F0', color: '#1C1412', fontWeight: 700, textDecoration: 'none', padding: '0 16px' }
+  if (Platform.OS === 'web') {
+    return createElement('a', { href, target: '_blank', rel: 'noreferrer', style }, label)
+  }
+  return (
+    <Pressable accessibilityRole="link" accessibilityLabel={label} onPress={() => void Linking.openURL(href)} style={{ minHeight: 48, borderRadius: 999, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF7F0', paddingHorizontal: 16 }}>
+      <Txt weight={700} color="#1C1412">{label}</Txt>
+    </Pressable>
   )
 }
