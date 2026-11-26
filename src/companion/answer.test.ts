@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { answerQuestion, distressDetected } from './answer'
 import { callCompanionLlm, COMPANION_LLM_ENABLED } from './llm'
-import { gratitudeStreak } from '../journal/streak'
+import { gratitudeStreak, weekMarks } from '../journal/streak'
 import { quizCorrect, PROGRAMMES, lessonProgress } from '../learn/programmes'
 import { dailyTeaching } from '../teachings/daily'
 import { isWaitlistEmail, isWaitlistPlan } from '../pricing/plans'
@@ -47,6 +47,12 @@ describe('daily pieces', () => {
     expect(gratitudeStreak(['2026-11-24', '2026-11-25', '2026-11-26'], '2026-11-26')).toBe(3)
     expect(gratitudeStreak(['2026-11-25'], '2026-11-26')).toBe(1)
     expect(gratitudeStreak(['2026-11-20'], '2026-11-26')).toBe(0)
+    const marks = weekMarks(['2026-11-24', '2026-11-26'], '2026-11-26')
+    expect(marks.map((mark) => mark.label)).toEqual(['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])
+    expect(marks[0]?.key).toBe('2026-11-23')
+    expect(marks[1]?.opened).toBe(true)
+    expect(marks[2]?.opened).toBe(false)
+    expect(marks[3]?.isToday).toBe(true)
   })
 
   it('marks paid plans for the waitlist only', () => {

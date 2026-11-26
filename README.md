@@ -23,7 +23,7 @@ Copy `.env.example` to `.env` for local overrides. The URL and publishable key a
 
 Never commit a service-role key, database password, Stripe secret, or webhook secret. Billing stays a “Coming soon” paywall. Paid media stays behind feature flags (`video_mode`, `premium_voices`, `billing`, `offline_media`).
 
-The site is a single-page web export (`web.output` is `single`) hosted at `https://mikeflyingtothestar.github.io/bible-storybook/`. `experiments.baseUrl` is `/bible-storybook`, so routes and assets include that prefix. GitHub Pages has no rewrite rules, so `npm run export:web` copies `index.html` to `404.html` (SPA fallback) and writes `.nojekyll` so the `_expo` asset folder is published.
+The site is a single-page web export (`web.output` is `single`) hosted at `https://mikeflyingtothestar.github.io/bible-storybook/`. `experiments.baseUrl` is `/bible-storybook`, so routes and assets include that prefix. GitHub Pages has no rewrite rules. `npm run export:web` writes a real HTML file for every route (so `/pricing` and `/onboarding` return 200), copies `index.html` to `404.html` for anything still unknown, and writes `.nojekyll` so the `_expo` asset folder is published.
 
 ## Bible text
 
