@@ -12,7 +12,7 @@ export default function ChooseVersion() {
   const { colors } = useAppTheme()
   return (
     <OnboardingStep
-      step="1 of 4"
+      step="1 of 5"
       title="Which Bible should we open?"
       body="You can change this any time. The World English Bible is the default, and a few of its chapters are already on this device."
       next="/theme"

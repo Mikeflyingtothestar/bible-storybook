@@ -116,6 +116,7 @@ async function loadRemote(
     .select('id, chapter_id, number, osis_ref, text')
     .eq('chapter_id', chapterId)
     .order('number')
+    .limit(200)
   if (error) throw new Error(error.message)
   const rows = (data ?? []) as unknown as RemoteVerse[]
   return {

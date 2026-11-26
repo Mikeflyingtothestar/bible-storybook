@@ -16,7 +16,7 @@ export default function BedtimeHome() {
     <View style={{ flex: 1, backgroundColor: bedtime.bg, padding: 24, gap: 16 }}>
       <Text style={{ color: bedtime.text, fontFamily: fontSerif(700), fontSize: 36 }}>Bedtime</Text>
       <Text style={{ color: bedtime.muted, fontFamily: fontSans(), fontSize: 16, lineHeight: 24 }}>
-        A dim screen and a slow reading. Illustrated bedtime stories arrive later. These chapters are ready now.
+        One free wind-down each night. Psalm 23 is the short narrated sleep story. Set 2, 5, 10 or 15 minutes, then let it fade.
       </Text>
       {READINGS.map((reading) => (
         <Link key={reading.slug} href={`/bedtime/play/${reading.slug}`} asChild>

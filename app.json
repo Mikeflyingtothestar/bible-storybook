@@ -10,10 +10,10 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.biblestorybook.app"
+      "bundleIdentifier": "com.mikekhoo.biblestorybook"
     },
     "android": {
-      "package": "com.biblestorybook.app",
+      "package": "com.mikekhoo.biblestorybook",
       "adaptiveIcon": {
         "backgroundColor": "#F7F5F0",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

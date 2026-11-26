@@ -2,10 +2,7 @@ import { Link } from 'expo-router'
 import { useState, type ReactNode } from 'react'
 import { Platform, Pressable, View, type ViewStyle } from 'react-native'
 
-import { ART_SOURCES, HERO_BASILICA } from '@/src/art/images'
-import { ARTWORKS } from '@/src/art/works'
-import { ArtImage, CommonsLink } from '@/src/components/ArtworkFrame'
-import { OliveSprig, RoseWindow, Wordmark } from '@/src/components/Motifs'
+import { Wordmark } from '@/src/components/Motifs'
 import { Button, Screen, ThemeSwitcher, Txt } from '@/src/components/ui'
 import { useAppTheme } from '@/src/theme/ThemeProvider'
 
@@ -43,16 +40,13 @@ function Band({
   children,
   background,
   pad = 88,
-  motif = false,
 }: {
   children: ReactNode
   background: string
   pad?: number
-  motif?: boolean
 }) {
   return (
     <View style={{ width: '100%', backgroundColor: background, paddingVertical: pad, paddingHorizontal: 20, overflow: 'hidden' }}>
-      {motif ? <RoseWindow /> : null}
       <View style={{ width: '100%', maxWidth: 1120, alignSelf: 'center' }}>{children}</View>
     </View>
   )
@@ -90,16 +84,17 @@ function ReaderMock({ dark }: { dark?: boolean }) {
 
 function BookScene() {
   return (
-    <View
-      style={{
-        height: 520,
-        width: '100%',
-        borderRadius: 36,
-        overflow: 'hidden',
-        ...(Platform.OS === 'web' ? ({ boxShadow: '0 18px 40px rgba(18, 18, 26, 0.16)' } as ViewStyle) : null),
-      }}
-    >
-      <ArtImage source={HERO_BASILICA} alt="Da Vinci-style sketch of an ancient basilica crowned with a cross" eager />
+    <View style={{ height: 420, width: '100%', borderRadius: 36, overflow: 'hidden', backgroundColor: '#E7F0FF' }}>
+      <View style={{ position: 'absolute', width: 280, height: 280, borderRadius: 140, backgroundColor: '#C9D8FF', top: -40, right: -20 }} />
+      <View style={{ position: 'absolute', width: 180, height: 180, borderRadius: 90, backgroundColor: '#D7F3EA', bottom: 40, left: 24 }} />
+      <View style={{ position: 'absolute', left: 28, right: 28, bottom: 28, gap: 6 }}>
+        <Txt size={13} weight={700} color="#4338CA" style={{ letterSpacing: 1.2 }}>
+          A QUIET MORNING
+        </Txt>
+        <Txt size={28} weight={700} serif color="#12121A">
+          Faith, calm and reflection.
+        </Txt>
+      </View>
     </View>
   )
 }
@@ -144,13 +139,13 @@ export default function LandingPage() {
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 36, alignItems: 'center', paddingTop: 28, paddingBottom: 20 }}>
           <View style={{ flexGrow: 1, flexBasis: 320, minWidth: 0, maxWidth: 640, gap: 22 }}>
             <Txt size={14} weight={700} color={colors.accent} style={{ letterSpacing: 1.6 }}>
-              A FAMILY BIBLE
+              DAILY VERSE
             </Txt>
             <Txt size={68} weight={700} serif style={{ letterSpacing: -1.5, maxWidth: 640 }}>
               The Bible, told like a story
             </Txt>
             <Txt size={20} color={colors.muted} style={{ maxWidth: 520, lineHeight: 30 }}>
-              Read the text, hear each verse as it is highlighted, and keep a quiet record of the days you showed up.
+              A few quiet minutes for faith, calm and reflection. The words are still the Bible. The pace is yours.
             </Txt>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
               <Link href="/bible" asChild>
@@ -167,7 +162,7 @@ export default function LandingPage() {
         </View>
       </Band>
 
-      <Band background={wash} motif>
+      <Band background={wash}>
         <Reveal>
           <Txt size={44} weight={700} serif>
             How it works
@@ -269,37 +264,21 @@ export default function LandingPage() {
         </Reveal>
       </Band>
 
-      <Band background={colors.bg} motif>
+      <Band background={colors.bg}>
         <Reveal>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-            <OliveSprig />
-            <Txt size={14} weight={700} color={colors.accent} style={{ letterSpacing: 1.4 }}>
-              FROM THE CATACOMBS TO THE ENGRAVERS
-            </Txt>
-          </View>
-          <Txt size={48} weight={700} serif style={{ marginTop: 12, maxWidth: 760 }}>
-            Art through the ages
+          <Txt size={40} weight={700} serif>
+            Verses for anxiety
           </Txt>
-          <Txt color={colors.muted} style={{ marginTop: 12, maxWidth: 640, marginBottom: 28 }}>
-            Eight works the church has lived with, from a Roman catacomb to a nineteenth-century Bible engraving. Each file on Wikimedia Commons is marked public domain.
+          <Txt color={colors.muted} style={{ marginTop: 8, maxWidth: 640 }}>
+            When worry is loud, the Bible in this app stays short. Matthew 6 says not to be anxious for tomorrow. Psalm 23 walks through a dark valley and does not walk it alone.
           </Txt>
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16 }}>
-            {ARTWORKS.map((work) => (
-              <View key={work.id} {...lift} style={{ flexGrow: 1, flexBasis: 240, minWidth: 0, backgroundColor: colors.surface, borderRadius: 24, overflow: 'hidden', borderWidth: 1, borderColor: colors.border }}>
-                <View style={{ height: 280, backgroundColor: colors.bg }}>
-                  <ArtImage source={ART_SOURCES[work.id]} alt={work.alt} />
-                </View>
-                <View style={{ padding: 18, gap: 6 }}>
-                  <Txt size={20} weight={700} serif>
-                    {work.title}
-                  </Txt>
-                  <Txt color={colors.muted}>
-                    {work.artist} · {work.date}
-                  </Txt>
-                  <CommonsLink href={work.page} />
-                </View>
-              </View>
-            ))}
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 16 }}>
+            <Link href="/bible/MAT/6" asChild>
+              <Button label="Read Matthew 6" />
+            </Link>
+            <Link href="/bible/PSA/23" asChild>
+              <Button label="Read Psalm 23" variant="quiet" />
+            </Link>
           </View>
         </Reveal>
       </Band>
@@ -320,16 +299,16 @@ export default function LandingPage() {
               <Txt size={40} weight={700} serif>
                 $0
               </Txt>
-              <Txt>The whole Bible text, bookmarks, highlights, the device voice, and a 15 minute bedtime timer.</Txt>
+              <Txt>Today’s verse, a short teaching, a prayer, and a small journal. Nothing here is for sale.</Txt>
             </View>
             <View {...lift} style={{ flexGrow: 1, flexBasis: 300, backgroundColor: colors.bg, borderRadius: 28, padding: 32, gap: 10, borderWidth: 2, borderColor: colors.accent }}>
               <Txt size={14} weight={700} color={colors.accent} style={{ letterSpacing: 1 }}>
-                PREMIUM · PLANNED
+                PREMIUM · COMING SOON
               </Txt>
               <Txt size={40} weight={700} serif>
-                Video stories
+                US$5.99
               </Txt>
-              <Txt color={colors.muted}>Human or anime films, offline video, and a share with your family. The switch stays off until a plan exists.</Txt>
+              <Txt color={colors.muted}>Or US$39.99 a year. Monthly or annual only. Cancel anytime, no weekly billing. Family is explained on the pricing page, after individual plans.</Txt>
             </View>
           </View>
         </Reveal>

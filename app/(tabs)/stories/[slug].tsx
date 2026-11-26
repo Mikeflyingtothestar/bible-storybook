@@ -1,7 +1,8 @@
 import { Link, useLocalSearchParams } from 'expo-router'
 import { View } from 'react-native'
 
-import { AppBar, Column, Screen, Txt } from '@/src/components/ui'
+import { AppBar, Button, Column, Screen, Txt } from '@/src/components/ui'
+import { speakText } from '@/src/voice/speak'
 import { useEntitlement } from '@/src/entitlement/useEntitlement'
 import { STORIES } from '@/src/stories/catalog'
 import { useAppTheme } from '@/src/theme/ThemeProvider'
@@ -27,6 +28,7 @@ export default function StoryDetail() {
       <AppBar title={story.title} backHref="/stories" />
       <Column width={720} style={{ gap: 14 }}>
         <Txt color={colors.muted}>{story.summary}</Txt>
+        <Button label="Listen to the story" onPress={() => speakText(story.scenes.map((scene) => scene.narration).join(' '))} />
         <Txt color={colors.muted}>
           Pictures are still being prepared. {video === 'flag-off' ? 'Video stories are coming soon.' : video === 'upgrade' ? 'Video is a Premium feature.' : 'Video is available for this tier.'}
         </Txt>

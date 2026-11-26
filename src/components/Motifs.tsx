@@ -63,9 +63,7 @@ export function Wordmark() {
   const { colors } = useAppTheme()
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-      <Txt size={22} weight={700} serif color={colors.accent}>
-        ☧
-      </Txt>
+      <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: colors.accent }} accessibilityElementsHidden />
       <Txt weight={700}>Bible Storybook</Txt>
     </View>
   )
