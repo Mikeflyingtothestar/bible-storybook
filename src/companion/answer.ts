@@ -7,8 +7,16 @@ export const COMPANION_DISCLAIMER = 'This is not a therapist, a pastor, or medic
 
 export const CRISIS_RESOURCES = {
   befriendersMalaysia: 'https://www.befrienders.org.my/',
+  befriendersWorldwide: 'https://www.befrienders.org/',
   findAHelpline: 'https://findahelpline.com',
 } as const
+
+/** World English Bible, public domain. Not in the small bundled sample, so it is quoted here in full. */
+export const CRISIS_VERSE: CitedVerse = {
+  osisRef: 'PSA.34.18',
+  label: 'Psalm 34:18',
+  text: 'Yahweh is near to those who have a broken heart, and saves those who have a crushed spirit.',
+}
 
 const TOPIC_REFS: Record<TopicId, string[]> = Object.fromEntries(TOPIC_GUIDES.map((guide) => [guide.id, guide.refs])) as Record<TopicId, string[]>
 
@@ -25,30 +33,52 @@ const TOPIC_WORDS: Record<TopicId, string[]> = {
   anger: ['anger', 'angry', 'furious', 'rage', 'resent'],
 }
 
-const DISTRESS = [
+const CRISIS_PHRASES = [
   'suicide',
   'suicidal',
   'kill myself',
+  'killing myself',
   'end my life',
+  'end it all',
   'want to die',
-  'self-harm',
   'self harm',
   'hurt myself',
+  'hurting myself',
+  "don't want to live",
+  'dont want to live',
+  'do not want to live',
 ]
+
+const CRISIS_COMPACT = ['selfharm', 'killmyself', 'killingmyself', 'enditall', 'endmylife', 'wanttodie', 'hurtmyself', 'hurtingmyself']
 
 export type CompanionResult =
   | { kind: 'need-more'; text: string; disclaimer: string }
   | {
       kind: 'answer'
-      text: string
+      reflection: string
+      prayer: string | null
       citations: CitedVerse[]
-      crisis: { befriendersMalaysia: string; findAHelpline: string } | null
       disclaimer: string
     }
+  | { kind: 'crisis'; verse: CitedVerse; disclaimer: string }
+
+/** Lower-case, straighten apostrophes, and treat hyphens as spaces. */
+export function normalizeForDistress(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[’‘]/g, "'")
+    .replace(/[-‐‑‒–—/]+/g, ' ')
+    .replace(/[^a-z0-9'\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
 
 export function distressDetected(text: string): boolean {
-  const haystack = text.toLowerCase()
-  return DISTRESS.some((phrase) => haystack.includes(phrase))
+  const normalized = normalizeForDistress(text)
+  if (!normalized) return false
+  if (CRISIS_PHRASES.some((phrase) => normalized.includes(phrase))) return true
+  const compact = normalized.replace(/ /g, '')
+  return CRISIS_COMPACT.some((phrase) => compact.includes(phrase))
 }
 
 export function topicsIn(text: string): TopicId[] {
@@ -81,22 +111,18 @@ export function answerQuestion(question: string): CompanionResult {
   if (trimmed.length < 2) {
     return { kind: 'need-more', text: 'Ask in a few words, such as rest, forgiveness, or worry.', disclaimer }
   }
-  const crisis = distressDetected(trimmed)
-  const citations = citationsFor(crisis ? `${trimmed} grief anxiety` : trimmed)
-  const quoted = (citations.length > 0 ? citations : [requireVerse('PSA.23.1')]).slice(0, 4)
-  const lines = quoted.map((verse) => `${verse.label}: “${verse.text}”`)
+  if (distressDetected(trimmed)) {
+    return { kind: 'crisis', verse: CRISIS_VERSE, disclaimer }
+  }
   const topic = topicsIn(trimmed)[0]
   const guide = topic ? guideFor(topic) : null
-  const lead = crisis
-    ? 'This is not a therapist. If you might harm yourself, contact local emergency services now. findahelpline.com lists lines by country, and Befrienders Malaysia is one place to start. The bundled text says:'
-    : guide
-      ? `${guide.reflection} A short prayer: ${guide.prayer} The bundled World English Bible says:`
-      : 'Here is what the bundled World English Bible says, and nothing beyond it.'
+  const citations = citationsFor(trimmed)
+  const quoted = (citations.length > 0 ? citations : [requireVerse('PSA.23.1')]).slice(0, 4)
   return {
     kind: 'answer',
-    text: `${lead} ${lines.join(' ')}`,
+    reflection: guide?.reflection ?? 'Here is what the bundled World English Bible says, and nothing beyond it.',
+    prayer: guide?.prayer ?? null,
     citations: quoted,
-    crisis: crisis ? CRISIS_RESOURCES : null,
     disclaimer,
   }
 }

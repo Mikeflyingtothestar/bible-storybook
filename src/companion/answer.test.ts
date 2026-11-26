@@ -18,9 +18,10 @@ describe('companion answers', () => {
     expect(result.kind).toBe('answer')
     if (result.kind !== 'answer') return
     expect(result.citations.length).toBeGreaterThan(0)
-    expect(result.text).toContain(result.citations[0]?.label)
+    expect(result.citations[0]?.label.length).toBeGreaterThan(3)
+    expect(result.reflection.length).toBeGreaterThan(10)
     expect(result.disclaimer.toLowerCase()).toContain('not a therapist')
-    expect(result.crisis).toBeNull()
+    expect(result.prayer).toBeTruthy()
     const anxiety = answerQuestion('I feel lonely')
     if (anxiety.kind !== 'answer') throw new Error('expected an answer')
     expect(anxiety.citations.length).toBeGreaterThanOrEqual(3)
@@ -36,13 +37,23 @@ describe('companion answers', () => {
     }
   })
 
-  it('shows crisis resources and still cites a verse', () => {
-    expect(distressDetected('I want to die')).toBe(true)
+  it('detects crisis phrasing without catching die to self', () => {
+    for (const phrase of ['I want to die', 'KILL MYSELF', 'end it all', 'suicide', 'self-harm', 'self   harm', 'SelfHarm', "I don't want to live", 'I dont want to live', 'hurt myself']) {
+      expect(distressDetected(phrase), phrase).toBe(true)
+    }
+    for (const phrase of ['die to self', 'I will die to self', 'the seed will die', 'I died to my old habits']) {
+      expect(distressDetected(phrase), phrase).toBe(false)
+    }
+  })
+
+  it('answers a crisis with one gentle verse and no anxiety text', () => {
     const result = answerQuestion('I want to die')
-    if (result.kind !== 'answer') throw new Error('expected an answer')
-    expect(result.crisis?.findAHelpline).toContain('findahelpline.com')
-    expect(result.text.toLowerCase()).toContain('not a therapist')
-    expect(result.citations.length).toBeGreaterThan(0)
+    expect(result.kind).toBe('crisis')
+    if (result.kind !== 'crisis') return
+    expect(result.verse.label).toBe('Psalm 34:18')
+    expect(result.verse.text.toLowerCase()).not.toContain('anxious')
+    expect(result.verse.text.toLowerCase()).not.toContain('eat')
+    expect(JSON.stringify(result).toLowerCase()).not.toContain('matthew')
   })
 
   it('leaves the language model switched off', async () => {
